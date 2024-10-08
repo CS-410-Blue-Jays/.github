@@ -18,8 +18,8 @@ public class Scanner {
     enum TokenType {
         KEYWORD, OPERATOR, IDENTIFIER, LITERAL, OPEN_PARENTHESIS, CLOSE_PARENTHESIS, 
 		OPEN_BRACKET, CLOSE_BRACKET, OPEN_SQ_BRACKET, CLOSE_SQ_BRACKET, SEMICOLON, 
-		SINGLE_QUOTE, DOUBLE_QUOTE, COMMA, ESCAPE, COLON, PROCESSOR, COMMENT, CHAR, 
-		STRING, ESCAPE_SEQUENCE;
+		COMMA, ESCAPE, COLON, PROCESSOR, COMMENT, CHAR, 
+		STRING, ESCAPE_SEQUENCE, MULTILINE_COMMENT;
     }
 
     static class Token {
@@ -130,7 +130,8 @@ public class Scanner {
 		new AbstractMap.SimpleEntry<>('\\', 36),
 		new AbstractMap.SimpleEntry<>(':', 37),
 		new AbstractMap.SimpleEntry<>('#', 38),
-		new AbstractMap.SimpleEntry<>(' ', 39)
+		new AbstractMap.SimpleEntry<>(' ', 39),
+		new AbstractMap.SimpleEntry<>('\n', 39)
 		);
 
 	static Integer[][] stateTransition = {
@@ -168,7 +169,7 @@ public class Scanner {
 		{null, null, null, null, null, null, null, null, null, null, 32, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, 56, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, 60, 56, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, 37, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
@@ -193,7 +194,11 @@ public class Scanner {
 		{56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}	};
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},	
+		{60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 61, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60},
+		{60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 62, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
+	};
 
 	static TokenType[] acceptingStates = {null, TokenType.OPEN_PARENTHESIS, TokenType.CLOSE_PARENTHESIS, TokenType.OPEN_BRACKET, TokenType.CLOSE_BRACKET, null, TokenType.OPERATOR, null, TokenType.OPERATOR, 
 		TokenType.OPERATOR, TokenType.OPERATOR, TokenType.LITERAL, TokenType.LITERAL, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.KEYWORD, 
@@ -201,7 +206,7 @@ public class Scanner {
 		TokenType.IDENTIFIER, TokenType.KEYWORD, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, 
 		TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.KEYWORD, TokenType.OPERATOR, 
 		TokenType.OPERATOR, TokenType.IDENTIFIER, TokenType.SEMICOLON, null, null, TokenType.COMMA, TokenType.OPEN_SQ_BRACKET, TokenType.CLOSE_SQ_BRACKET, 
-		null, TokenType.COLON, TokenType.PROCESSOR, TokenType.COMMENT, TokenType.CHAR, TokenType.STRING, TokenType.ESCAPE_SEQUENCE};
+		null, TokenType.COLON, TokenType.PROCESSOR, TokenType.COMMENT, TokenType.CHAR, TokenType.STRING, TokenType.ESCAPE_SEQUENCE, null, null, TokenType.MULTILINE_COMMENT,};
 
 	private static List<Token> scan(String input){
 		input += "\n"; // Add newline to end of input to finalize last token in a sequence
@@ -212,31 +217,37 @@ public class Scanner {
 		for(int i = 0; i < input.length(); i++){
 				char c = input.charAt(i);
 
-				if(Character.isWhitespace(c) && state != 56 && state != 49){
+				if(Character.isWhitespace(c) && state != 56 && state != 49 && state != 60 && state != 61){
+					// Finalizes a token if it is in a state and resets the state
 					if(state != 0){
 						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
 						state = 0;
 					}
+					// Skips whitespace between tokens
 					bookmark = i+1;
 					continue;
-				} else if (c == '\n' && state != 56){
-					tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
-					state = 0;
-					bookmark = i;
+				} else if (state == 56) {
+					// Finalizes a single-line comment token when newline is found
+					if(c == '\n'){
+						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
+						state = 0;
+						bookmark = i+1;
+					}
 				}
 
 				if(stateMap.get(c) != null && stateTransition[state][stateMap.get(c)] != null){
-					//check to see if accepting state  to finalize token
-					if(acceptingStates[state] != null && i < input.length() - 1 && i < 30 && stateTransition[state][i+1] != null && acceptingStates[stateTransition[state][i+1]] != acceptingStates[state]){
+					//	check to see if accepting state to finalize token
+					if((acceptingStates[state] != null && i < input.length() - 1 && i < 30 && stateTransition[state][i+1] != null && acceptingStates[stateTransition[state][i+1]] != acceptingStates[state])){
 						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));		
 						state = 0;
 						bookmark = i;
 					} else if (input.length() == i){
-						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
+						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));		
 						state = 0;
 						bookmark = i;
 					}
 				} else {
+					//	check to see if accepting state to finalize token
 					if(acceptingStates[state] != null){
 						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
 						state = 0;
@@ -246,25 +257,28 @@ public class Scanner {
 				if(stateMap.get(c) == null) {
 					System.out.println("Character not recognized: " + c);
 					break;
-				} else if(stateTransition[state][stateMap.get(c)] != null){
-					System.out.println("State: " + state + " Character: " + c + " Next State: " + stateTransition[state][stateMap.get(c)]);
+				} else if(stateTransition[state][stateMap.get(c)] != null)
 					state = stateTransition[state][stateMap.get(c)];
-				}
 		}
 		return tokens;
 	}
 		public static void main(String args[]){
 			System.out.println("Enter the name of the file you'd like to tokenize: ");
 			String path = System.console().readLine();
-			List<Token> tokens = new ArrayList<>();
+			List<Token> tokens = new ArrayList<>(); // Its definitely used, quiet down compiler
 
 			File newFile = new File(path);
 
 			try (RandomAccessFile file = new RandomAccessFile(newFile.getAbsolutePath(), "r")) {
 				System.out.println("Tokenizing file: '" + newFile.getName() + '\'');
+
+				// Append each line to the total input
+				String input = "";
+
 				String line;
 				while((line = file.readLine()) != null)
-					tokens.addAll(scan(line));
+					input += line + '\n';
+				tokens = scan(input);
 				file.close();
 			} catch(IOException e){
 				String error = e.getLocalizedMessage();
