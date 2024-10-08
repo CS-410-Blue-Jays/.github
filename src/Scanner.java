@@ -213,8 +213,10 @@ public class Scanner {
 				char c = input.charAt(i);
 
 				if(Character.isWhitespace(c) && state != 56 && state != 49){
-					if(state != 0)
+					if(state != 0){
 						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
+						state = 0;
+					}
 					bookmark = i+1;
 					continue;
 				} else if (c == '\n' && state != 56){
