@@ -16,7 +16,7 @@ import java.util.*;
 public class Scanner {
 
     enum TokenType {
-        KEYWORD, OPERATOR, IDENTIFIER, LITERAL, OPEN_PARENTHESIS, CLOSE_PARENTHESIS, OPEN_BRACKET, CLOSE_BRACKET, OPEN_SQ_BRACKET, CLOSE_SQ_BRACKET, SEMICOLON, SINGLE_QUOTE, DOUBLE_QUOTE, COMMA, ESCAPE, COLON, PROCESSOR;
+        KEYWORD, OPERATOR, IDENTIFIER, LITERAL, OPEN_PARENTHESIS, CLOSE_PARENTHESIS, OPEN_BRACKET, CLOSE_BRACKET, OPEN_SQ_BRACKET, CLOSE_SQ_BRACKET, SEMICOLON, SINGLE_QUOTE, DOUBLE_QUOTE, COMMA, ESCAPE, COLON, PROCESSOR, COMMENT, CHAR, STRING;
     }
 
     static class Token {
@@ -126,66 +126,70 @@ public class Scanner {
 		new AbstractMap.SimpleEntry<>(']', 35),
 		new AbstractMap.SimpleEntry<>('\\', 36),
 		new AbstractMap.SimpleEntry<>(':', 37),
-		new AbstractMap.SimpleEntry<>('#', 38)
+		new AbstractMap.SimpleEntry<>('#', 38),
+		new AbstractMap.SimpleEntry<>(' ', 39)
 		);
 
 	static Integer[][] stateTransition = {
-		{1, 2, 3, 4, 5, 7, 44, 9, 12, 29, 31, 33, 34, 35, 36, 38, 11, 13, 46, 25, 46, 46, 18, 46, 46, 46, 46, 46, 40, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, 6, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, 8, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, 10, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, 12, null, null, null, null, null, null, null, 11, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 12, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 14, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 15, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 16, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 17, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
+		{1, 2, 3, 4, 5, 7, 44, 9, 12, 29, 31, 33, 34, 35, 36, 38, 11, 13, 46, 25, 46, 46, 18, 46, 46, 46, 46, 46, 40, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, 6, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, 8, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, 10, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, 12, null, null, null, null, null, null, null, 11, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 12, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 14, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 15, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 16, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 17, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 21, 46, 46, 19, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 20, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 22, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 23, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 24, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 26, 46, 46, 46, 46, 27, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 28, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, 30, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, 32, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, 56, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, 37, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, 39, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 41, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 42, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 43, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 21, 46, 46, 19, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 20, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, 45, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 22, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 23, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 24, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 26, 46, 46, 46, 46, 27, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 28, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, 30, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, 32, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, 37, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, 39, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 41, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 42, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 43, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, 45, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 57, 48, 48, 48, 48, 48, 48, 48, 48},
+		{49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 58, 49, 49, 49, 49, 49, 49, 49},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+		{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 	};
 
 	static TokenType[] acceptingStates = {null, TokenType.OPEN_PARENTHESIS, TokenType.CLOSE_PARENTHESIS, TokenType.OPEN_BRACKET, TokenType.CLOSE_BRACKET, null, TokenType.OPERATOR, null, TokenType.OPERATOR, 
@@ -193,25 +197,27 @@ public class Scanner {
 		TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.KEYWORD, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.KEYWORD, TokenType.IDENTIFIER, TokenType.KEYWORD, 
 		TokenType.IDENTIFIER, TokenType.KEYWORD, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, 
 		TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.KEYWORD, TokenType.OPERATOR, 
-		TokenType.OPERATOR, TokenType.IDENTIFIER, TokenType.SEMICOLON, TokenType.SINGLE_QUOTE, TokenType.DOUBLE_QUOTE, TokenType.COMMA, TokenType.OPEN_SQ_BRACKET, TokenType.CLOSE_SQ_BRACKET, 
-		TokenType.ESCAPE, TokenType.COLON, TokenType.PROCESSOR};
+		TokenType.OPERATOR, TokenType.IDENTIFIER, TokenType.SEMICOLON, null, null, TokenType.COMMA, TokenType.OPEN_SQ_BRACKET, TokenType.CLOSE_SQ_BRACKET, 
+		TokenType.ESCAPE, TokenType.COLON, TokenType.PROCESSOR, TokenType.COMMENT, TokenType.CHAR, TokenType.STRING};
 
 	private static List<Token> scan(String input){
-		input += " "; // Add whitespace to end of input to finalize last token
+		input += "\n"; // Add newline to end of input to finalize last token in a sequence
 		List<Token> tokens = new ArrayList<>();
 		int state = 0; // Start
 		int bookmark = 0; // Start of token
 
 		for(int i = 0; i < input.length(); i++){
 				char c = input.charAt(i);
-				
-				if(Character.isWhitespace(c)){
-					if(state != 0){
+
+				if(Character.isWhitespace(c) && state != 56 && state != 49){
+					if(state != 0)
 						tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
-						state = 0;
-					}
 					bookmark = i+1;
 					continue;
+				} else if (c == '\n' && state != 56){
+					tokens.add(new Token(acceptingStates[state], input.substring(bookmark, i)));
+					state = 0;
+					bookmark = i;
 				}
 
 				if(stateMap.get(c) != null && stateTransition[state][stateMap.get(c)] != null){
@@ -235,8 +241,10 @@ public class Scanner {
 				if(stateMap.get(c) == null) {
 					System.out.println("Character not recognized: " + c);
 					break;
-				} else if(stateTransition[state][stateMap.get(c)] != null)
+				} else if(stateTransition[state][stateMap.get(c)] != null){
+					System.out.println("State: " + state + " Character: " + c + " Next State: " + stateTransition[state][stateMap.get(c)]);
 					state = stateTransition[state][stateMap.get(c)];
+				}
 		}
 		return tokens;
 	}
