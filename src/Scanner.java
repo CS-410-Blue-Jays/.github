@@ -13,29 +13,8 @@ import java.io.RandomAccessFile;
 import java.util.*;
 
 
-public class Scanner {
+public class Scanner extends Token{
 
-    enum TokenType {
-        KEYWORD, OPERATOR, IDENTIFIER, LITERAL, OPEN_PARENTHESIS, CLOSE_PARENTHESIS, 
-		OPEN_BRACKET, CLOSE_BRACKET, OPEN_SQ_BRACKET, CLOSE_SQ_BRACKET, SEMICOLON, 
-		COMMA, ESCAPE, COLON, PROCESSOR, COMMENT, CHAR, 
-		STRING, ESCAPE_SEQUENCE, MULTILINE_COMMENT;
-    }
-
-    static class Token {
-        TokenType type;
-        String value;
-
-        public Token(TokenType type, String value) {
-            this.type = type;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return "Token{type='" + type + "', value='" + value + "'}";
-        }
-    }
 	//creates an immutable map
 	static Map<Character, Integer> stateMap = Map.ofEntries(
 		new AbstractMap.SimpleEntry<>('(', 0),
