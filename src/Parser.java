@@ -195,6 +195,22 @@ public class Parser extends Token{
     private static final Set<String> ARITHMETIC_OPERATORS = Set.of("++", "+", "--", "-", "*", "/", "%");
     private static final Set<String> TYPES = Set.of("int", "float");
 
+     private List<Atom> parseUpdate() {
+        List<Atom> atoms = new ArrayList<>();
+        
+        String identifier = parseIdentifier();
+        atoms.add(new Atom(identifier));
+        
+        String operator = getCurrentToken().value;
+        if (!operator.equals("++") && !operator.equals("--")) {
+            throw new RuntimeException();
+        }
+        advance();
+        atoms.add(new Atom(operator));
+        
+        return atoms;
+    }
+
     private String parseType() {
         Token token = getCurrentToken();
         if (token != null && token.getTokenType() == TokenType.KEYWORD && TYPES.contains(token.value)) {
