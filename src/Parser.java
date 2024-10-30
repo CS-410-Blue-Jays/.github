@@ -1,10 +1,7 @@
-import Token.TokenType;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Parser extends Token{
   public static void main(String[] args) {
-    ArrayList<Token> tokens = new ArrayList<>();
     tokens.add(new Token(TokenType.KEYWORD, "if"));
     tokens.add(new Token(TokenType.OPEN_PARENTHESIS, "("));
     tokens.add(new Token(TokenType.LITERAL, "1"));
@@ -79,7 +76,7 @@ public class Parser extends Token{
   }
 
   // Helper method to parse brackets, keeping track of open brackets vs closed brackets
-  private static void parseBrackets(ArrayList<Token> tokens, ArrayList<Atom> atoms){
+  private static void parseBrackets(){
     expect(TokenType.OPEN_BRACKET, "{");
     openBrackets++;
     while(openBrackets != 0){
@@ -128,14 +125,14 @@ public class Parser extends Token{
     expect(TokenType.OPEN_PARENTHESIS, "(");
     atoms.addAll(parseCondition());
     expect(TokenType.CLOSE_PARENTHESIS, ")");
-    parseBrackets(tokens, atoms);
+    parseBrackets();
     if(accept(TokenType.KEYWORD, "else") == 1){
       if(accept(TokenType.KEYWORD, "if") == 1){
         atoms.addAll(parseIf());
       } else {
-        parseBrackets(tokens, atoms);
+        parseBrackets();
       }
-      parseBrackets(tokens, atoms);
+      parseBrackets();
     }
     return atoms;
   }
@@ -146,7 +143,7 @@ public class Parser extends Token{
     expect(TokenType.OPEN_PARENTHESIS, "(");
     atoms.addAll(parseCondition());
     expect(TokenType.CLOSE_PARENTHESIS, ")");
-    parseBrackets(tokens, atoms);
+    parseBrackets();
     return atoms;
   }
 
@@ -160,7 +157,7 @@ public class Parser extends Token{
     expect(TokenType.SEMICOLON, ";");
     atoms.addAll(parseUpdate());
     expect(TokenType.CLOSE_PARENTHESIS, ")");
-    parseBrackets(tokens, atoms);
+    parseBrackets();
     return atoms;
   }
 
@@ -180,7 +177,7 @@ public class Parser extends Token{
   // Method to parse initializations
   private static ArrayList<Atom> parseInitialization(){
     parseType();
-    
+
     return atoms;
   }
 
