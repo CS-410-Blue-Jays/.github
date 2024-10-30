@@ -14,27 +14,12 @@ public class Parser extends Token{
         this.currentIndex = 0;
     }
 
-  public static void main(String[] args) {
-    ArrayList<Token> tokens = new ArrayList<>();
-    tokens.add(new Token(TokenType.KEYWORD, "if"));
-    tokens.add(new Token(TokenType.OPEN_PARENTHESIS, "("));
-    tokens.add(new Token(TokenType.LITERAL, "1"));
-    tokens.add(new Token(TokenType.OPERATOR, "<"));
-    tokens.add(new Token(TokenType.LITERAL, "2"));
-    tokens.add(new Token(TokenType.CLOSE_PARENTHESIS, ")"));
-    tokens.add(new Token(TokenType.OPEN_BRACKET, "{"));
-    tokens.add(new Token(TokenType.LITERAL, "3"));
-    tokens.add(new Token(TokenType.OPERATOR, "+"));
-    tokens.add(new Token(TokenType.LITERAL, "4"));
-    tokens.add(new Token(TokenType.CLOSE_BRACKET, "}"));
-    parse();
-  }
   
 
 
-  public static ArrayList<Atom> parse(){
+  public  ArrayList<Atom> parse(){
    
-    parseProgram();
+    return parseProgram();
   }
 
      private boolean hasMoreTokens() {
@@ -54,17 +39,17 @@ public class Parser extends Token{
     
 
        Token current = getCurrentToken();
-        if (current != null && current.getTokenType() == type && current.getValue().equals(value)) {
+        if (current != null && current.getTokenType() == type && current.value.equals(value)) {
             advance();
             return true;
         }
         return false;
   }
 
-  
+  // excpect is basically the same as accept but on fail should crash / throw exception 
   private void expect(Token.TokenType type, String value){
     if (!accept(type, value)) {
-            Token current = getCurrentToken();
+            
             throw new RuntimeException();
         }
   }
@@ -143,7 +128,7 @@ public class Parser extends Token{
     atoms.addAll(parseTerm());
     return atoms;
   }
-
+  // changed parseIf a little bit
   private List<Atom> parseIf(){
     ArrayList<Atom> atoms = new ArrayList<>();
     expect(TokenType.KEYWORD, "if");
@@ -181,7 +166,7 @@ public class Parser extends Token{
   }
 
 
-
+    // allllll the helper methods lol 
     private static final Set<String> ASSIGNMENT_OPERATORS = Set.of("=", "+=", "-=");
     private static final Set<String> COMPARATORS = Set.of(">", "<", ">=", "<=", "==");
     private static final Set<String> ARITHMETIC_OPERATORS = Set.of("++", "+", "--", "-", "*", "/", "%");
