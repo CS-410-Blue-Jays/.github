@@ -1,8 +1,19 @@
 import java.beans.Expression;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Parser extends Token{
+
+  private final List<Token> tokens;
+  private int currentIndex = 0;
+    
+    public Parser(List<Token> tokens) {
+        this.tokens = tokens;
+        this.currentIndex = 0;
+    }
+
   public static void main(String[] args) {
     ArrayList<Token> tokens = new ArrayList<>();
     tokens.add(new Token(TokenType.KEYWORD, "if"));
@@ -16,51 +27,83 @@ public class Parser extends Token{
     tokens.add(new Token(TokenType.OPERATOR, "+"));
     tokens.add(new Token(TokenType.LITERAL, "4"));
     tokens.add(new Token(TokenType.CLOSE_BRACKET, "}"));
-    parse(tokens);
+    parse();
   }
   
-  private static int currentIndex = 0;
 
-  public static ArrayList<Atom> parse(ArrayList<Token> tokens){
-    ArrayList<Atom> atoms = new ArrayList<>();
-    parseProgram(tokens, atoms);
+
+  public static ArrayList<Atom> parse(){
+   
+    parseProgram();
   }
 
-  // Helper method to accept a token, if present, advance to next token
-  private int accept(Token.TokenType type, String value){
-    if(getToken().getTokenType() == type && getToken().value.equals(value)){
-      advance();
-      return 1;
-    } else
-      return 0;
+     private boolean hasMoreTokens() {
+        return currentIndex < tokens.size();
+    }
+
+      private Token getCurrentToken() {
+        return hasMoreTokens() ? tokens.get(currentIndex) : null;
+    }
+
+    private  Token advance(){
+    return tokens.get(currentIndex++);
   }
 
-  // Helper method to assert a token (if it is not present, crash the program)
+
+  private  boolean accept(Token.TokenType type, String value){
+    
+
+       Token current = getCurrentToken();
+        if (current != null && current.getTokenType() == type && current.getValue().equals(value)) {
+            advance();
+            return true;
+        }
+        return false;
+  }
+
+  
   private void expect(Token.TokenType type, String value){
-    if(accept(type, value) == 0)
-      throw new RuntimeException("Unexpected token: " + getToken().getTokenType() + " with value: " + getToken().value);
+    if (!accept(type, value)) {
+            Token current = getCurrentToken();
+            throw new RuntimeException();
+        }
   }
 
-  private static ArrayList<Atom> parseProgram(ArrayList<Token> tokens,ArrayList<Atom> atoms){
-    parseStatement(atoms);
-    if(peek() != null)
-      parseProgram(tokens, atoms);
-    return atoms;
+  private  ArrayList<Atom> parseProgram(){
+    ArrayList<Atom> atoms = new ArrayList<>();
+        
+        while (hasMoreTokens()) {
+            atoms.addAll(parseStatement());
+        }
+        
+        return atoms;
   }
 
-  private static ArrayList<Atom> parseStatement(ArrayList<Atom> atoms){
+  private  ArrayList<Atom> parseStatement(){
     ArrayList<Atom> atoms = new ArrayList<>();
     Token token = getToken();
-    if(accept(TokenType.KEYWORD, "if") == 1){
+    if(accept(TokenType.KEYWORD, "if")){
       atoms.addAll(parseIf());
-    } else if(accept(TokenType.KEYWORD, "while") == 1){
+    } else if(accept(TokenType.KEYWORD, "while")){
       atoms.addAll(parseWhile());
-    } else if(accept(TokenType.KEYWORD, "for") == 1){
+    } else if(accept(TokenType.KEYWORD, "for")){
       atoms.addAll(parseFor());
-    } else if(accept(TokenType.KEYWORD, "int") == 1 || accept(TokenType.KEYWORD, "float") == 1){
+    } else if(accept(TokenType.KEYWORD, "int") || accept(TokenType.KEYWORD, "float")){
       atoms.addAll(parseDeclaration());
     }
     return atoms;
+  }
+
+  private  ArrayList<Atom> parseExpression(){
+    List<Atom> atoms = new ArrayList<>();
+        
+        atoms.addAll(parseTerm());
+        while (isOperator(getCurrentToken())) {
+            atoms.add(new Atom(advance());
+            atoms.addAll(parseTerm());
+        }
+        
+        return atoms;
   }
 
   // Helper method to get current token
@@ -73,27 +116,31 @@ public class Parser extends Token{
   }
 
   // Helper method to move to the next token 
-  private static Token advance(){
-    return tokens.get(currentIndex++);
-  }
+
 
   // Helper method to peek at the next token without advancing
-  private static Token peek(){
+  private  Token peek(){
     return tokens.get(currentIndex + 1);
   }
 
   // Method to parse the expression
-  private Expression parseTerm(){
-    Token token = getToken();
-    if(token.getTokenType() == TokenType.LITERAL){
-
-    }
-    return null;
+  private ArrayList<Atom> parseTerm(){
+    ArrayList<Atom> atoms = new ArrayList<>();
+        
+        if (accept(TokenType.OPEN_PARENTHESIS, "(")) {
+            atoms.addAll(parseExpression());
+            expect(TokenType.CLOSE_PARENTHESIS, ")");
+        }
+        else {
+            atoms.add(new Atom(parseOperand()));
+        }
+        
+        return atoms;
   }
 
   private List<Atom> parseCondition(){
     List<Atom> atoms = new ArrayList<>();
-    atoms.add(parseTerm());
+    atoms.addAll(parseTerm());
     return atoms;
   }
 
@@ -112,9 +159,9 @@ public class Parser extends Token{
       } else if(token.getTokenType() == TokenType.CLOSE_BRACKET){
         openBrackets--;
       }
-      atoms.add(parseTerm());
+      atoms.addAll(parseTerm());
     }
-    if(accept(TokenType.KEYWORD, "else") == 1){
+    if(accept(TokenType.KEYWORD, "else")){
       expect(TokenType.OPEN_BRACKET, "{");
       openBrackets = 1;
       while(openBrackets != 0){
@@ -124,7 +171,7 @@ public class Parser extends Token{
         } else if(token.getTokenType() == TokenType.CLOSE_BRACKET){
           openBrackets--;
         }
-        atoms.add(parseTerm());
+        atoms.addAll(parseTerm());
       }
     }
 
@@ -132,18 +179,78 @@ public class Parser extends Token{
 
     return atoms;
   }
+
+
+
+    private static final Set<String> ASSIGNMENT_OPERATORS = Set.of("=", "+=", "-=");
+    private static final Set<String> COMPARATORS = Set.of(">", "<", ">=", "<=", "==");
+    private static final Set<String> ARITHMETIC_OPERATORS = Set.of("++", "+", "--", "-", "*", "/", "%");
+    private static final Set<String> TYPES = Set.of("int", "float");
+
+    private String parseType() {
+        Token token = getCurrentToken();
+        if (token != null && token.getTokenType() == TokenType.KEYWORD && TYPES.contains(token.value)) {
+            advance();
+            return token.value;
+        }
+        throw new RuntimeException();
+    }
+    
+    private String parseIdentifier() {
+        Token token = getCurrentToken();
+        if (token != null && token.getTokenType() == TokenType.IDENTIFIER) {
+            advance();
+            return token.value;
+        }
+        throw new RuntimeException();
+    }
+    
+    private String parseOperand() {
+        Token token = getCurrentToken();
+        if (token != null && (token.getTokenType() == TokenType.LITERAL || token.getTokenType() == TokenType.IDENTIFIER)) {
+            advance();
+            return token.value;
+        }
+        throw new RuntimeException();
+    }
+    
+    private String parseComparator() {
+        Token token = getCurrentToken();
+        if (token != null && token.getTokenType() == TokenType.OPERATOR && COMPARATORS.contains(token.value)) {
+            advance();
+            return token.value;
+        }
+        throw new RuntimeException();
+    }
+    
+    private String parseAssignmentOperator() {
+        Token token = getCurrentToken();
+        if (token != null && token.getTokenType() == TokenType.OPERATOR && ASSIGNMENT_OPERATORS.contains(token.value)) {
+            advance();
+            return token.value;
+        }
+        throw new RuntimeException();
+    }
+
+  private boolean isType(Token token) {
+        return token != null && token.getTokenType() == TokenType.KEYWORD && TYPES.contains(token.value);
+    }
+    
+    private boolean isIdentifier(Token token) {
+        return token != null && token.getTokenType() == TokenType.IDENTIFIER;
+    }
+    
+    private boolean isOperand(Token token) {
+        return token != null && (token.getTokenType() == TokenType.LITERAL || token.getTokenType() == TokenType.IDENTIFIER);
+    }
+    
+    private boolean isComparator(Token token) {
+        return token != null && token.getTokenType() == TokenType.OPERATOR && COMPARATORS.contains(token.value);
+    }
+    
+    private boolean isOperator(Token token) {
+        return token != null && token.getTokenType() == TokenType.OPERATOR && ARITHMETIC_OPERATORS.contains(token.value);
+    }
 }
 
-  private void parseBrackets(){
-    expect(TokenType.OPEN_BRACKET, "{");
-    int openBrackets = 1;
-    while(openBrackets != 0){
-      Token token = getToken();
-      if(token.getTokenType() == TokenType.OPEN_BRACKET){
-        openBrackets++;
-      } else if(token.getTokenType() == TokenType.CLOSE_BRACKET){
-        openBrackets--;
-      }
-      parseTerm();
-    }
-  }
+
