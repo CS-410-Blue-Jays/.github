@@ -123,6 +123,29 @@ public class Parser extends Token{
         return atoms;
   }
 
+  private List<Atom> parseInitialization() {
+        List<Atom> atoms = new ArrayList<>();
+        
+        String type = parseType();
+        atoms.add(new Atom(type));
+        
+        String identifier = parseIdentifier();
+        atoms.add(new Atom(identifier));
+        
+        expect(TokenType.OPERATOR, "=");
+        
+        if (isOperand(getCurrentToken())) {
+            atoms.add(new Atom(parseOperand()));
+        }
+        else {
+            atoms.addAll(parseExpression());
+        }
+        
+        expect(TokenType.OPERATOR, ";");
+        
+        return atoms;
+    }
+
   private List<Atom> parseCondition(){
     List<Atom> atoms = new ArrayList<>();
     atoms.addAll(parseTerm());
