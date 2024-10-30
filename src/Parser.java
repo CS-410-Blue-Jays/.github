@@ -18,6 +18,7 @@ public class Parser extends Token{
   
   private static int currentIndex = 0;
   private static int openBrackets = 0;
+  private static int openParen = 0;
   private static final ArrayList<Atom> atoms = new ArrayList<>();
   private static ArrayList<Token> tokens = new ArrayList<>();
 
@@ -89,6 +90,36 @@ public class Parser extends Token{
     }
   }
 
+  // Helper method for parsing parenthesis for conditionals/expressions
+  private static void parseParenthesis(String type){
+    expect(TokenType.OPEN_PARENTHESIS);
+    openParen++;
+    while(openBrackets != 0){
+      if(accept(TokenType.OPEN_PARENTHESIS) == 1){
+        openParen++;
+        switch(type){
+          case "condition":
+            atoms.addAll(parseCondition());
+            break;
+          case "expression":
+            atoms.addAll(parseExpression());
+            break;
+          case "for":
+            atoms.addAll(parseInitialization());
+            expect(TokenType.SEMICOLON, ";");
+            atoms.addAll(parseCondition());
+            expect(TokenType.SEMICOLON, ";");
+            atoms.addAll(parseUpdate());
+            break;
+          case "update":
+            atoms.addAll(parseUpdate());
+            break;
+        }
+      } else if(accept(TokenType.CLOSE_PARENTHESIS) == 1)
+        openParen--;
+    }
+  }
+
   /*
    * The following methods are used to recursively parse the given tokens; starting with the 
    * highest abstract level: parseProgram() until the code is fully translated into simple atoms.
@@ -114,17 +145,13 @@ public class Parser extends Token{
     (peek().value.equals("int") || peek().value.equals("float")))
       atoms.addAll(parseInitialization());
     else if(peek().getTokenType() == TokenType.LITERAL || peek().getTokenType() == TokenType.IDENTIFIER)
-      atoms.addAll(parseAssignment());
-    else if(peek().getTokenType() == TokenType.OPEN_PARENTHESIS)
       atoms.addAll(parseExpression());
   }
 
   // Method to parse if statements
   private static ArrayList<Atom> parseIf(){
     expect(TokenType.KEYWORD, "if");
-    expect(TokenType.OPEN_PARENTHESIS, "(");
-    atoms.addAll(parseCondition());
-    expect(TokenType.CLOSE_PARENTHESIS, ")");
+    parseParenthesis("condition");
     parseBrackets();
     if(accept(TokenType.KEYWORD, "else") == 1){
       if(accept(TokenType.KEYWORD, "if") == 1){
@@ -140,9 +167,7 @@ public class Parser extends Token{
   // Method to parse while statements
   private static ArrayList<Atom> parseWhile(){
     expect(TokenType.KEYWORD, "while");
-    expect(TokenType.OPEN_PARENTHESIS, "(");
-    atoms.addAll(parseCondition());
-    expect(TokenType.CLOSE_PARENTHESIS, ")");
+    parseParenthesis("condition");
     parseBrackets();
     return atoms;
   }
@@ -150,20 +175,25 @@ public class Parser extends Token{
   // Method to parse for statements
   private static ArrayList<Atom> parseFor(){
     expect(TokenType.KEYWORD, "for");
-    expect(TokenType.OPEN_PARENTHESIS, "(");
-    atoms.addAll(parseInitialization());
-    expect(TokenType.SEMICOLON, ";");
-    atoms.addAll(parseCondition());
-    expect(TokenType.SEMICOLON, ";");
-    atoms.addAll(parseUpdate());
-    expect(TokenType.CLOSE_PARENTHESIS, ")");
+    parseParenthesis("for");
     parseBrackets();
     return atoms;
   }
 
   // Method to parse expressions
   private static ArrayList<Atom> parseExpression(){
-      
+    atoms.addAll(parseOperand());
+    if(peek().getTokenType() == TokenType.OPERATOR && peek().value.equals("=")){
+      atoms.addAll(parseAssignment());
+    } else if(peek().getTokenType() == TokenType.OPERATOR && (peek().value.equals("++") || peek().value.equals("--"))){
+      atoms.addAll(parseUpdate());
+    } else {
+      atoms.addAll(parseOperator());
+      if(peek().getTokenType() == TokenType.OPEN_PARENTHESIS){
+        parseParenthesis("expression");
+      } else
+        atoms.addAll(parseOperand());
+    }
     return atoms;
   }
 
