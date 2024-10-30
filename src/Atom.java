@@ -3,11 +3,15 @@ public class Atom {
   private String left;
   private String right;
   private String result;
-  private String destination;
   private String comparison;
+  private String destination;
+
+  public Atom mathAtom(String operation, String left, String right, String result){
+    return new Atom(operation, left, right, result);
+  }
   
   // Constructor for add/mul/div/sub operations
-  public Atom(String operation, String left, String right, String Result){
+  public Atom(String operation, String left, String right, String result){
     this.operation = operation;
     this.left = left;
     this.right = right;

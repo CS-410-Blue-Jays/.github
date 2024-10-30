@@ -15,6 +15,38 @@ import java.util.*;
 
 public class Scanner extends Token{
 
+	public static void main(String args[]){
+		System.out.println("Enter the name of the file you'd like to tokenize: ");
+		String path = System.console().readLine();
+		ArrayList<Token> tokens = new ArrayList<>(); // Its definitely used, quiet down compiler
+
+		File newFile = new File(path);
+
+		try (RandomAccessFile file = new RandomAccessFile(newFile.getAbsolutePath(), "r")) {
+			System.out.println("Tokenizing file: '" + newFile.getName() + '\'');
+
+			// Append each line to the total input
+			String input = "";
+
+			String line;
+			while((line = file.readLine()) != null)
+				input += line + '\n';
+			tokens.addAll(scan(input));
+			file.close();
+		} catch(IOException e){
+			String error = e.getLocalizedMessage();
+			System.out.println("Error reading file '"+ newFile.getName() + "': " + error.substring(error.indexOf('(') + 1, error.length()-1) + ", check the file path and try again.");
+			System.exit(-1);
+		}
+
+		// Once all tokens are found, print them
+		if(tokens.isEmpty())
+			System.out.println("No tokens found! Try pointing to a different file.");
+		else
+			for(Token token : tokens)
+				System.out.println(token);
+	}
+
 	//creates an immutable map
 	static Map<Character, Integer> stateMap = Map.ofEntries(
 		new AbstractMap.SimpleEntry<>('(', 0),
@@ -187,7 +219,7 @@ public class Scanner extends Token{
 		TokenType.OPERATOR, TokenType.IDENTIFIER, TokenType.SEMICOLON, null, null, TokenType.COMMA, TokenType.OPEN_SQ_BRACKET, TokenType.CLOSE_SQ_BRACKET, 
 		null, TokenType.COLON, TokenType.PROCESSOR, TokenType.COMMENT, TokenType.CHAR, TokenType.STRING, TokenType.ESCAPE_SEQUENCE, null, null, TokenType.MULTILINE_COMMENT,};
 
-	private static List<Token> scan(String input){
+	public static List<Token> scan(String input){
 		input += "\n"; // Add newline to end of input to finalize last token in a sequence
 		List<Token> tokens = new ArrayList<>();
 		int state = 0; // Start
@@ -241,35 +273,4 @@ public class Scanner extends Token{
 		}
 		return tokens;
 	}
-		public static void main(String args[]){
-			System.out.println("Enter the name of the file you'd like to tokenize: ");
-			String path = System.console().readLine();
-			List<Token> tokens = new ArrayList<>(); // Its definitely used, quiet down compiler
-
-			File newFile = new File(path);
-
-			try (RandomAccessFile file = new RandomAccessFile(newFile.getAbsolutePath(), "r")) {
-				System.out.println("Tokenizing file: '" + newFile.getName() + '\'');
-
-				// Append each line to the total input
-				String input = "";
-
-				String line;
-				while((line = file.readLine()) != null)
-					input += line + '\n';
-				tokens = scan(input);
-				file.close();
-			} catch(IOException e){
-				String error = e.getLocalizedMessage();
-				System.out.println("Error reading file '"+ newFile.getName() + "': " + error.substring(error.indexOf('(') + 1, error.length()-1) + ", check the file path and try again.");
-				System.exit(-1);
-			}
-
-			// Once all tokens are found, print them
-			if(tokens.isEmpty())
-				System.out.println("No tokens found! Try pointing to a different file.");
-			else
-				for(Token token : tokens)
-					System.out.println(token);
-		}
 }
