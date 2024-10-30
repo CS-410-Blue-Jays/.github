@@ -74,7 +74,7 @@ public class Parser extends Token{
     } else if(accept(TokenType.KEYWORD, "for")){
       atoms.addAll(parseFor());
     } else if(accept(TokenType.KEYWORD, "int") || accept(TokenType.KEYWORD, "float")){
-      atoms.addAll(parseDeclaration());
+      atoms.addAll(parseInitialization());
     }
     return atoms;
   }
