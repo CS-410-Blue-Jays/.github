@@ -32,6 +32,6 @@ public class Main {
 			if(tokens.isEmpty())
 				System.out.println("No tokens found! Try pointing to a different file.");
 			else
-				Parser.parse(tokens);
+				System.out.println(Parser.parse(tokens));
     }
 }

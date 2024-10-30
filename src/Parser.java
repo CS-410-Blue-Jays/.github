@@ -1,4 +1,3 @@
-import java.beans.Expression;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +22,11 @@ public class Parser extends Token{
 
   public static ArrayList<Atom> parse(ArrayList<Token> tokens){
     ArrayList<Atom> atoms = new ArrayList<>();
-    parseProgram(tokens, atoms);
+    return parseProgram(tokens, atoms);
   }
 
   // Helper method to accept a token, if present, advance to next token
-  private int accept(Token.TokenType type, String value){
+  private static int accept(Token.TokenType type, String value){
     if(getToken().getTokenType() == type && getToken().value.equals(value)){
       advance();
       return 1;
@@ -42,24 +41,21 @@ public class Parser extends Token{
   }
 
   private static ArrayList<Atom> parseProgram(ArrayList<Token> tokens,ArrayList<Atom> atoms){
-    parseStatement(atoms);
-    if(peek() != null)
+    parseStatement(tokens, atoms);
+    if(peek(tokens) != null)
       parseProgram(tokens, atoms);
     return atoms;
   }
 
-  private static ArrayList<Atom> parseStatement(ArrayList<Atom> atoms){
-    ArrayList<Atom> atoms = new ArrayList<>();
-    Token token = getToken();
-    if(accept(TokenType.KEYWORD, "if") == 1){
+  private static ArrayList<Atom> parseStatement(ArrayList<Token> tokens, ArrayList<Atom> atoms){
+    if(accept(TokenType.KEYWORD, "if") == 1)
       atoms.addAll(parseIf());
-    } else if(accept(TokenType.KEYWORD, "while") == 1){
+    else if(accept(TokenType.KEYWORD, "while") == 1)
       atoms.addAll(parseWhile());
-    } else if(accept(TokenType.KEYWORD, "for") == 1){
+    else if(accept(TokenType.KEYWORD, "for") == 1)
       atoms.addAll(parseFor());
-    } else if(accept(TokenType.KEYWORD, "int") == 1 || accept(TokenType.KEYWORD, "float") == 1){
+    else if(accept(TokenType.KEYWORD, "int") == 1 || accept(TokenType.KEYWORD, "float") == 1)
       atoms.addAll(parseDeclaration());
-    }
     return atoms;
   }
 
@@ -78,68 +74,52 @@ public class Parser extends Token{
   }
 
   // Helper method to peek at the next token without advancing
-  private static Token peek(){
+  private static Token peek(ArrayList<Token> tokens){
     return tokens.get(currentIndex + 1);
   }
 
   // Method to parse the expression
-  private Expression parseTerm(){
-    Token token = getToken();
-    if(token.getTokenType() == TokenType.LITERAL){
-
-    }
-    return null;
+  private ArrayList<Atom> parseExpression(ArrayList<Token> tokens, ArrayList<Atom> atoms){
+    while(tokens != null)
+      
+    return atoms;
   }
 
   private List<Atom> parseCondition(){
     List<Atom> atoms = new ArrayList<>();
-    atoms.add(parseTerm());
+    atoms.add(parseExpression());
     return atoms;
   }
 
-  private List<Atom> parseIf(){
-    ArrayList<Atom> atoms = new ArrayList<>();
+  private ArrayList<Atom> parseIf(ArrayList<Token> tokens, ArrayList<Atom> atoms){
     expect(TokenType.KEYWORD, "if");
     expect(TokenType.OPEN_PARENTHESIS, "(");
     atoms.addAll(parseCondition()); // Parse the condition as an expression
     expect(TokenType.CLOSE_PARENTHESIS, ")");
-    expect(TokenType.OPEN_BRACKET, "{");
-    int openBrackets = 1;
-    while(openBrackets != 0){
-      Token token = getToken();
-      if(token.getTokenType() == TokenType.OPEN_BRACKET){
-        openBrackets++;
-      } else if(token.getTokenType() == TokenType.CLOSE_BRACKET){
-        openBrackets--;
-      }
-      atoms.add(parseTerm());
-    }
+    parseBrackets(tokens, atoms);
     if(accept(TokenType.KEYWORD, "else") == 1){
-      expect(TokenType.OPEN_BRACKET, "{");
-      openBrackets = 1;
-      while(openBrackets != 0){
-        Token token = getToken();
-        if(token.getTokenType() == TokenType.OPEN_BRACKET){
-          openBrackets++;
-        } else if(token.getTokenType() == TokenType.CLOSE_BRACKET){
-          openBrackets--;
-        }
-        atoms.add(parseTerm());
+      if(accept(TokenType.KEYWORD, "if") == 1){
+        atoms.addAll(parseIf(tokens, atoms));
+      } else {
+        parseBrackets(tokens, atoms);
       }
+      parseBrackets(tokens, atoms);
     }
-
-
-
     return atoms;
   }
 }
 
-  private void parseBrackets(){
-    expect(TokenType.OPEN_BRACKET, "{");
+  private ArrayList<Atom> parseWhile(ArrayList<Token> tokens, ArrayList<Atom> atoms){
+    return atoms;
+  }
+
+  private static void parseBrackets(ArrayList<Token> tokens, ArrayList<Atom> atoms){
+    expect(Token.TokenType.OPEN_BRACKET, "{");
     int openBrackets = 1;
     while(openBrackets != 0){
       Token token = getToken();
       if(token.getTokenType() == TokenType.OPEN_BRACKET){
+        parseProgram(tokens, atoms);
         openBrackets++;
       } else if(token.getTokenType() == TokenType.CLOSE_BRACKET){
         openBrackets--;
