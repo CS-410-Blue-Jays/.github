@@ -9,6 +9,11 @@ public class Atom {
   public enum Operation {
     ADD, SUB, MUL, DIV, JMP, NEG, LBL, TST, MOV
   }
+
+  @Override
+  public String toString() {
+      return "(" + operation + ", " + left + ", " + right + ", " + result + ", " + destination + ", " + checkComparator() + ")";
+  }
   
   // Constructor for add/sub/mul/div operations
   // Example (SUB, "A", "B", "C") -> C = A - B
@@ -17,7 +22,7 @@ public class Atom {
     this.left = left;
     this.right = right;
     this.result = result;
-    this.destination = null;
+    this.destination = "";
     this.comparison = -1;
   }
 
@@ -25,9 +30,9 @@ public class Atom {
   // Example (JMP, "dest") -> Jump to label or (LBL, "label") -> Label
   public Atom(Operation operation, String destination){
     this.operation = operation;
-    this.left = null;
-    this.right = null;
-    this.result = null;
+    this.left = "";
+    this.right = "";
+    this.result = "";
     this.destination = destination;
     this.comparison = -1;
   }
@@ -38,7 +43,7 @@ public class Atom {
     this.operation = operation;
     this.left = left;
     this.right = right;
-    this.result = null;
+    this.result = "";
     this.destination = destination;
     this.comparison = comparison;
   }
@@ -48,14 +53,14 @@ public class Atom {
   public Atom(Operation operation, String left, String result){
     this.operation = operation;
     this.left = left;
-    this.right = null;
+    this.right = "";
     this.result = result;
-    this.destination = null;
+    this.destination = "";
     this.comparison = -1;
   }
 
   // Checks the operation of the atom
-  public String checkOp(){
+  public String checkOperator(){
     return this.operation.toString();
   }
 
@@ -84,7 +89,7 @@ public class Atom {
       case 4 -> "LesserOrEqual";
       case 5 -> "GreaterOrEqual";
       case 6 -> "NotEqual";
-      default -> "None";
+      default -> "";
     };
   }
 

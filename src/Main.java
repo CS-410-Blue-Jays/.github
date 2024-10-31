@@ -38,6 +38,9 @@ public class Main {
 
 			System.out.println("\nParsing tokens...");
 			// Parse the tokens
-			System.out.println(Parser.parse(tokens));
+			ArrayList<Atom> atoms = Parser.parse(tokens);
+			for(Atom atom : atoms)
+				System.out.println(atom.toString());
+
     }
 }

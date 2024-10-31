@@ -51,7 +51,6 @@ public class Parser extends Token{
   // Helper method to accept a token without it's value and advance to next token
   private static boolean accept(Token.TokenType type){
     if(getCurrentToken().type.equals(type)){
-      System.out.println("Here" + getCurrentToken().value + " " + getCurrentToken().type + " expected: " + type);
       advance();
       return true;
     } else
@@ -60,13 +59,13 @@ public class Parser extends Token{
 
   // Helper method to assert a token with a specific value
   private static void expect(Token.TokenType type, String value){
-    if(accept(type, value))
+    if(!accept(type, value))
       throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value + " expected: " + value);
   }
  
   // Helper method to assert a token without it's value
   private static void expect(Token.TokenType type){
-    if(accept(type))
+    if(!accept(type))
       throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value + " expected: " + type);
   }
 
@@ -77,7 +76,7 @@ public class Parser extends Token{
 
   // Helper method to peek at the next token without advancing
   private static Token peek(){
-    return tokens.get(currentIndex + 1);
+    return hasMoreTokens() ? tokens.get(currentIndex + 1) : null;
   }
 
   // Helper method to parse brackets, keeping track of open brackets vs closed brackets
@@ -157,8 +156,8 @@ private boolean isOperator(Token token) {
   // Parse program is the highest level of abstraction, it will parse the entire program ~ Brandon
   private static void parseProgram(){
     parseStatement();
-    // if(hasMoreTokens())
-    //   parseProgram();
+    if(hasMoreTokens())
+      parseProgram();
   }
 
   // Parse statement is the second highest level of abstraction, it will parse a single statement ~ Brandon
@@ -172,8 +171,10 @@ private boolean isOperator(Token token) {
     else if(getCurrentToken().getTokenType() == TokenType.KEYWORD && 
     (getCurrentToken().value.equals("int") || getCurrentToken().value.equals("float"))){
       parseInitialization();
-    }else if(peek().getTokenType() == TokenType.LITERAL || peek().getTokenType() == TokenType.IDENTIFIER)
+    }else if(getCurrentToken().getTokenType().equals(TokenType.LITERAL) || getCurrentToken().getTokenType().equals(TokenType.IDENTIFIER)){
       parseExpression();
+    }else
+      throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value);
   }
 
   // Method to parse if statements ~ Brandon
@@ -209,27 +210,29 @@ private boolean isOperator(Token token) {
   }
 
   // Method to parse expressions ~ Creek
-  private static ArrayList<Atom> parseExpression(){
-    parseOperand();
-    if(peek().getTokenType() == TokenType.OPERATOR && peek().value.equals("=")){
+  private static void parseExpression(){
+    if(peek().type.equals(TokenType.OPERATOR) && peek().value.equals("=")){
       parseAssignment();
-    } else if(peek().getTokenType() == TokenType.OPERATOR && (peek().value.equals("++") || peek().value.equals("--"))){
+    } else if(peek().type.equals(TokenType.OPERATOR) && (peek().value.equals("++") || peek().value.equals("--"))){
       parseUpdate();
     } else {
       parseOperator();
-      if(peek().getTokenType() == TokenType.OPEN_PARENTHESIS){
+      if(peek().getTokenType().equals(TokenType.OPEN_PARENTHESIS)){
         parseParenthesis("expression");
       } else
         parseOperand();
     }
-    return atoms;
   }
 
-  // Method to parse assignments
-  private static ArrayList<Atom> parseAssignment(){
+  // Method to parse assignments into atoms
+  private static void parseAssignment(){
+    // Use expect Identifier because it should not be a literal
+    String identifier = getCurrentToken().value;
     expect(TokenType.IDENTIFIER);
-    parseOperator();
-    return atoms;
+
+    String operator = parseOperator();
+
+    String value = parseOperand();
   }
 
   // Method to parse initializations ~ Creek
@@ -246,7 +249,7 @@ private boolean isOperator(Token token) {
       identifier += ".0";
 
     // Parse the assignment operator
-    expect(TokenType.OPERATOR, parseOperator());
+    expect(TokenType.OPERATOR, "=");
 
     // Parse the left hand side of the assignment
     String value = parseOperand();
@@ -259,7 +262,7 @@ private boolean isOperator(Token token) {
 
   // Method to parse conditional statements
   private static ArrayList<Atom> parseCondition(){
-    atoms.addAll(parseExpression());
+    parseExpression();
     return atoms;
   }
 
