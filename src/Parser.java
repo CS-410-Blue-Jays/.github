@@ -112,10 +112,10 @@ public class Parser extends Token{
             expect(TokenType.SEMICOLON, ";");
             atoms.addAll(parseCondition());
             expect(TokenType.SEMICOLON, ";");
-            atoms.addAll(parseUpdate());
+            parseUpdate();
             break;
           case "update":
-            atoms.addAll(parseUpdate());
+            parseUpdate();
             break;
         }
       } else if(accept(TokenType.CLOSE_PARENTHESIS))
@@ -174,7 +174,6 @@ private boolean isOperator(Token token) {
       atoms.addAll(parseWhile());
     else if(accept(TokenType.KEYWORD, "for"))
       atoms.addAll(parseFor());
-    // Below are experimental...
     else if(peek().getTokenType() == TokenType.KEYWORD && 
     (peek().value.equals("int") || peek().value.equals("float")))
       atoms.addAll(parseInitialization());
@@ -218,9 +217,9 @@ private boolean isOperator(Token token) {
   private static ArrayList<Atom> parseExpression(){
     atoms.addAll(parseOperand());
     if(peek().getTokenType() == TokenType.OPERATOR && peek().value.equals("=")){
-      atoms.addAll(parseAssignment());
+      parseAssignment();
     } else if(peek().getTokenType() == TokenType.OPERATOR && (peek().value.equals("++") || peek().value.equals("--"))){
-      atoms.addAll(parseUpdate());
+      parseUpdate();
     } else {
       atoms.addAll(parseOperator());
       if(peek().getTokenType() == TokenType.OPEN_PARENTHESIS){
