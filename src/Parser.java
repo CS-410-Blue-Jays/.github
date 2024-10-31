@@ -97,26 +97,20 @@ public class Parser extends Token{
   private static void parseParenthesis(String type){
     expect(TokenType.OPEN_PARENTHESIS);
     openParen++;
-    while(openBrackets != 0){
+    while(openParen != 0){
       if(accept(TokenType.OPEN_PARENTHESIS)){
         openParen++;
         switch(type){
-          case "condition":
-            atoms.addAll(parseCondition());
-            break;
-          case "expression":
-            atoms.addAll(parseExpression());
-            break;
-          case "for":
-            atoms.addAll(parseInitialization());
-            expect(TokenType.SEMICOLON, ";");
-            atoms.addAll(parseCondition());
-            expect(TokenType.SEMICOLON, ";");
-            parseUpdate();
-            break;
-          case "update":
-            parseUpdate();
-            break;
+          case "condition" -> parseCondition();
+          case "expression" -> parseExpression();
+          case "for" -> {
+              parseInitialization();
+              expect(TokenType.SEMICOLON, ";");
+              parseCondition();
+              expect(TokenType.SEMICOLON, ";");
+              parseUpdate();
+              }
+          case "update" -> parseUpdate();
         }
       } else if(accept(TokenType.CLOSE_PARENTHESIS))
         openParen--;
