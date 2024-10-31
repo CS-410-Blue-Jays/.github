@@ -84,7 +84,7 @@ public class Parser extends Token{
         
         atoms.addAll(parseTerm());
         while (isOperator(getCurrentToken())) {
-            atoms.add(new Atom(advance());
+            atoms.add(new Atom(advance()));
             atoms.addAll(parseTerm());
         }
         
@@ -151,6 +151,7 @@ public class Parser extends Token{
     atoms.addAll(parseTerm());
     return atoms;
   }
+
   // changed parseIf a little bit
   private List<Atom> parseIf(){
     ArrayList<Atom> atoms = new ArrayList<>();
