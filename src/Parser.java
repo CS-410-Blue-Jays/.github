@@ -50,7 +50,8 @@ public class Parser extends Token{
 
   // Helper method to accept a token without it's value and advance to next token
   private static boolean accept(Token.TokenType type){
-    if(getCurrentToken().type == type){
+    if(getCurrentToken().type.equals(type)){
+      System.out.println("Here" + getCurrentToken().value + " " + getCurrentToken().type + " expected: " + type);
       advance();
       return true;
     } else
@@ -60,13 +61,13 @@ public class Parser extends Token{
   // Helper method to assert a token with a specific value
   private static void expect(Token.TokenType type, String value){
     if(accept(type, value))
-      throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value);
+      throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value + " expected: " + value);
   }
  
   // Helper method to assert a token without it's value
   private static void expect(Token.TokenType type){
     if(accept(type))
-      throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value);
+      throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value + " expected: " + type);
   }
 
   // Helper method to move to the next token 
@@ -156,8 +157,8 @@ private boolean isOperator(Token token) {
   // Parse program is the highest level of abstraction, it will parse the entire program ~ Brandon
   private static void parseProgram(){
     parseStatement();
-    if(peek() != null)
-      parseProgram();
+    // if(hasMoreTokens())
+    //   parseProgram();
   }
 
   // Parse statement is the second highest level of abstraction, it will parse a single statement ~ Brandon
@@ -168,11 +169,11 @@ private boolean isOperator(Token token) {
       atoms.addAll(parseWhile());
     else if(accept(TokenType.KEYWORD, "for"))
       atoms.addAll(parseFor());
-    else if(peek().getTokenType() == TokenType.KEYWORD && 
-    (peek().value.equals("int") || peek().value.equals("float")))
-      atoms.addAll(parseInitialization());
-    else if(peek().getTokenType() == TokenType.LITERAL || peek().getTokenType() == TokenType.IDENTIFIER)
-      atoms.addAll(parseExpression());
+    else if(getCurrentToken().getTokenType() == TokenType.KEYWORD && 
+    (getCurrentToken().value.equals("int") || getCurrentToken().value.equals("float"))){
+      parseInitialization();
+    }else if(peek().getTokenType() == TokenType.LITERAL || peek().getTokenType() == TokenType.IDENTIFIER)
+      parseExpression();
   }
 
   // Method to parse if statements ~ Brandon
@@ -209,17 +210,17 @@ private boolean isOperator(Token token) {
 
   // Method to parse expressions ~ Creek
   private static ArrayList<Atom> parseExpression(){
-    atoms.addAll(parseOperand());
+    parseOperand();
     if(peek().getTokenType() == TokenType.OPERATOR && peek().value.equals("=")){
       parseAssignment();
     } else if(peek().getTokenType() == TokenType.OPERATOR && (peek().value.equals("++") || peek().value.equals("--"))){
       parseUpdate();
     } else {
-      atoms.addAll(parseOperator());
+      parseOperator();
       if(peek().getTokenType() == TokenType.OPEN_PARENTHESIS){
         parseParenthesis("expression");
       } else
-        atoms.addAll(parseOperand());
+        parseOperand();
     }
     return atoms;
   }
@@ -232,25 +233,28 @@ private boolean isOperator(Token token) {
   }
 
   // Method to parse initializations ~ Creek
-  private static ArrayList<Atom> parseInitialization(){
+  private static void parseInitialization(){
+    // Parse the type
+    Atom init;
     String type = parseType();
-    atoms.add(new Atom(type));
 
-    String identifier = parseIdentifier();
-    atoms.add(new Atom(identifier));
+    // Parse the identifier (result of the initialization)
+    String identifier = parseOperand();
 
-    expect(TokenType.OPERATOR, "=");
+    // Append a decimal if float and not already present
+    if(type.equals("float") && !identifier.contains("."))
+      identifier += ".0";
 
-    if (isOperand(getCurrentToken())) {
-        atoms.add(new Atom(parseOperand()));
-    }
-    else {
-        atoms.addAll(parseExpression());
-    }
+    // Parse the assignment operator
+    expect(TokenType.OPERATOR, parseOperator());
 
-    expect(TokenType.OPERATOR, ";");
+    // Parse the left hand side of the assignment
+    String value = parseOperand();
 
-    return atoms;
+    expect(TokenType.SEMICOLON, ";");
+
+    init = new Atom(Atom.Operation.MOV, value, identifier);
+    atoms.add(init);
   }
 
   // Method to parse conditional statements
@@ -270,43 +274,42 @@ private boolean isOperator(Token token) {
   }
 
   // Method to parse operators
-  private static ArrayList<Atom> parseOperator(){
-      
-      return atoms;
+  private static String parseOperator(){
+      String operator = getCurrentToken().value;
+      expect(TokenType.OPERATOR);
+      return operator;
   }
 
   // Method to parse operands ~ Creek
   private static String parseOperand(){
-    Token token = getCurrentToken();
-    if (token != null && (token.getTokenType() == TokenType.LITERAL || token.getTokenType() == TokenType.IDENTIFIER)) {
-      advance();
-      return token.value;
-    }
-    throw new RuntimeException();    
+    String value = getCurrentToken().value;
+    if(accept(TokenType.LITERAL)){}
+    else{expect(TokenType.IDENTIFIER);}
+    return value;   
   }
 
   // Method to parse updates (ie. i++, i--) ~ Creek
   private static void parseUpdate(){
     Atom update;
 
-    if(peek().value.equals("++")){
+    if(peek().value.equals("++"))
       update = new Atom(Atom.Operation.ADD, getCurrentToken().value, "1", getCurrentToken().value);
-    } else
+    else
       update = new Atom(Atom.Operation.SUB, getCurrentToken().value, "1", getCurrentToken().value);
     
     advance();
     advance();
-    expect(TokenType.OPERATOR, ";");
+    if(!getCurrentToken().value.equals(")"))
+      expect(Token.TokenType.SEMICOLON);
+
     atoms.add(update);
   }
 
   // Method to parse the types of variables in initializations
   private static String parseType(){
-    Token token = getCurrentToken();
-    if (token != null && token.getTokenType() == TokenType.KEYWORD && TYPES.contains(token.value)) {
-        advance();
-        return token.value;
-    }
-    throw new RuntimeException();
+    String value = getCurrentToken().value;
+    if(accept(TokenType.KEYWORD, "int")){}
+    else{expect(TokenType.KEYWORD, "float");}
+    return value;
   }
 }

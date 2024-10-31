@@ -6,7 +6,8 @@ import java.util.ArrayList;
 public class Main {
   public static void main(String[] args){
     System.out.println("Enter the name of the file you'd like to tokenize: ");
-			String path = System.console().readLine();
+			// String path = System.console().readLine();
+			String path = "HelloWorld.txt"; // For testing purposes
 			ArrayList<Token> tokens = new ArrayList<>(); // Its definitely used, quiet down compiler
 
 			File newFile = new File(path);
@@ -32,6 +33,11 @@ public class Main {
 			if(tokens.isEmpty())
 				System.out.println("No tokens found! Try pointing to a different file.");
 			else
-				System.out.println(Parser.parse(tokens));
+				for(Token tok : tokens)
+					System.out.println(tok.toString());
+
+			System.out.println("\nParsing tokens...");
+			// Parse the tokens
+			System.out.println(Parser.parse(tokens));
     }
 }
