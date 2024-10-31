@@ -124,27 +124,27 @@ private static final Set<String> ARITHMETIC_OPERATORS = Set.of("++", "+", "--", 
 private static final Set<String> TYPES = Set.of("int", "float");
 
 // Helper method to check if it is a type ~ Creek
-private boolean isType(Token token) {
+private static boolean isType(Token token) {
   return token != null && token.getTokenType() == TokenType.KEYWORD && TYPES.contains(token.value);
 }
 
 // Helper method to check if it is an identifier ~ Creek
-private boolean isIdentifier(Token token) {
+private static boolean isIdentifier(Token token) {
   return token != null && token.getTokenType() == TokenType.IDENTIFIER;
 }
 
 // Helper method to check if it is an operand ~ Creek
-private boolean isOperand(Token token) {
+private static boolean isOperand(Token token) {
   return token != null && (token.getTokenType() == TokenType.LITERAL || token.getTokenType() == TokenType.IDENTIFIER);
 }
 
 // Helper method to check if it is a comparator ~ Creek
-private boolean isComparator(Token token) {
+private static boolean isComparator(Token token) {
   return token != null && token.getTokenType() == TokenType.OPERATOR && COMPARATORS.contains(token.value);
 }
 
 // Helper method to check if it is an operator ~ Creek
-private boolean isOperator(Token token) {
+private static boolean isOperator(Token token) {
   return token != null && token.getTokenType() == TokenType.OPERATOR && ARITHMETIC_OPERATORS.contains(token.value);
 }
 
@@ -163,11 +163,11 @@ private boolean isOperator(Token token) {
   // Parse statement is the second highest level of abstraction, it will parse a single statement ~ Brandon
   private static void parseStatement(){
     if(accept(TokenType.KEYWORD, "if"))
-      atoms.addAll(parseIf());
+      parseIf();
     else if(accept(TokenType.KEYWORD, "while"))
-      atoms.addAll(parseWhile());
+      parseWhile();
     else if(accept(TokenType.KEYWORD, "for"))
-      atoms.addAll(parseFor());
+      parseFor();
     else if(getCurrentToken().getTokenType() == TokenType.KEYWORD && 
     (getCurrentToken().value.equals("int") || getCurrentToken().value.equals("float"))){
       parseInitialization();
@@ -195,7 +195,6 @@ private boolean isOperator(Token token) {
 
   // Method to parse while statements ~ Brandon
   private static ArrayList<Atom> parseWhile(){
-    expect(TokenType.KEYWORD, "while");
     parseParenthesis("condition");
     parseBrackets();
     return atoms;
@@ -203,7 +202,6 @@ private boolean isOperator(Token token) {
 
   // Method to parse for statements ~ Brandon
   private static ArrayList<Atom> parseFor(){
-    expect(TokenType.KEYWORD, "for");
     parseParenthesis("for");
     parseBrackets();
     return atoms;
@@ -211,12 +209,13 @@ private boolean isOperator(Token token) {
 
   // Method to parse expressions ~ Creek
   private static void parseExpression(){
-    if(peek().type.equals(TokenType.OPERATOR) && peek().value.equals("=")){
+    if(peek().type.equals(TokenType.OPERATOR) && (peek().value.equals("=") || peek().value.equals("+=") || peek().value.equals("-="))){
       parseAssignment();
     } else if(peek().type.equals(TokenType.OPERATOR) && (peek().value.equals("++") || peek().value.equals("--"))){
       parseUpdate();
     } else {
-      parseOperator();
+      if(peek().getTokenType().equals(TokenType.OPERATOR))
+        parseOperator();
       if(peek().getTokenType().equals(TokenType.OPEN_PARENTHESIS)){
         parseParenthesis("expression");
       } else
@@ -226,13 +225,31 @@ private boolean isOperator(Token token) {
 
   // Method to parse assignments into atoms
   private static void parseAssignment(){
+
+    Atom assignment;
+
     // Use expect Identifier because it should not be a literal
     String identifier = getCurrentToken().value;
     expect(TokenType.IDENTIFIER);
 
     String operator = parseOperator();
+    String value;
 
-    String value = parseOperand();
+    switch(operator){
+      case "=" -> {
+        value = parseOperand();
+        assignment = new Atom(Atom.Operation.MOV, value, identifier);
+        atoms.add(assignment);
+      }
+      case "+=", "-=" -> {
+        value = parseOperand();
+        assignment = new Atom(operator.equals("+=") ? Atom.Operation.ADD : Atom.Operation.SUB, identifier, value, identifier);
+        atoms.add(assignment);
+      }
+    }
+
+    if(!peek().value.equals(")"))
+      expect(TokenType.SEMICOLON, ";");
   }
 
   // Method to parse initializations ~ Creek
@@ -261,9 +278,8 @@ private boolean isOperator(Token token) {
   }
 
   // Method to parse conditional statements
-  private static ArrayList<Atom> parseCondition(){
+  private static void parseCondition(){
     parseExpression();
-    return atoms;
   }
 
   // Method to parse comparators
