@@ -23,6 +23,6 @@ STRING, ESCAPE_SEQUENCE, MULTILINE_COMMENT;
 
   @Override
   public String toString() {
-      return "Token{type='" + type + "', value='" + value + "'}";
+      return "Token[type='" + type + "', value='" + value + "']";
   }
 }
