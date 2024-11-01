@@ -89,12 +89,13 @@ public class Parser extends Token{
     expect(TokenType.OPEN_BRACKET, "{");
     openBrackets++;
     while(openBrackets != 0){
-      Token token = getCurrentToken();
-      if(token.getTokenType() == TokenType.OPEN_BRACKET){
-        parseProgram();
+      if(accept(TokenType.OPEN_BRACKET)){
         openBrackets++;
-      } else if(token.getTokenType() == TokenType.CLOSE_BRACKET)
+        parseProgram();
+      } else {
+        expect(TokenType.CLOSE_BRACKET);
         openBrackets--;
+      }
     }
   }
 
@@ -103,23 +104,23 @@ public class Parser extends Token{
     expect(TokenType.OPEN_PARENTHESIS, "(");
     openParen++;
     while(openParen != 0){
-      if(accept(TokenType.OPEN_PARENTHESIS)){
+      if(accept(TokenType.OPEN_PARENTHESIS))
         openParen++;
+      else if(accept(TokenType.CLOSE_PARENTHESIS))
+        openParen--;
+      else {
         switch(type){
-         case "condition" -> {parseCondition(); break;}
-          case "expression" -> {parseExpression(); break;}
+          case "condition" -> parseCondition(); 
+          case "expression" -> parseExpression(); 
           case "for" -> {
               parseInitialization();
-              expect(TokenType.SEMICOLON, ";");
               parseCondition();
               expect(TokenType.SEMICOLON, ";");
               parseUpdate();
-              break;
           }   
-          case "update" -> {parseUpdate(); break;}
+          case "update" -> parseUpdate();
         }
-      } else if(accept(TokenType.CLOSE_PARENTHESIS))
-        openParen--;
+      }
     }
   }
 
@@ -202,7 +203,6 @@ private static boolean isOperator(Token token) {
 
   // Method to parse if statements ~ Brandon
   private static void parseIf(){
-    expect(TokenType.KEYWORD, "if");
     parseParenthesis("condition");
     parseBrackets();
     atoms.add(new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++));
@@ -321,10 +321,8 @@ private static boolean isOperator(Token token) {
         expect(Token.TokenType.OPERATOR, "&&");
       
         atoms.add(new Atom(Atom.Operation.TST, temp.checkDestination(), parseCondition(), "LBL"+LABEL_INDEX, cmp));
-      } else {
+      } else 
         atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL"+LABEL_INDEX, cmp));
-        return "";
-      }
 
       //create atom for Condition '&&' Condition comparison
   
