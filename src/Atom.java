@@ -3,7 +3,7 @@ public class Atom {
   private final String left;
   private final String right;
   private final String result;
-  private final int comparison;
+  private int comparison;
   private final String destination;
 
   public enum Operation {
@@ -63,6 +63,10 @@ public class Atom {
     this.result = result;
     this.destination = "";
     this.comparison = -1;
+  }
+
+  public void setCMP(int comparison){
+    this.comparison = comparison;
   }
 
   // Checks the operation of the atom

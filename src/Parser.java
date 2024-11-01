@@ -20,8 +20,8 @@ public class Parser extends Token{
     parse(tokens);
   }
   
-  private static int LABEL = 0;
-  private static int temp = 0;
+  private static int LABEL_INDEX = 0;
+  private static int TEMP_INDEX = 0;
   private static int currentIndex = 0;
   private static int openBrackets = 0;
   private static int openParen = 0;
@@ -100,26 +100,23 @@ public class Parser extends Token{
 
   // Helper method for parsing parenthesis for conditionals/expressions
   private static void parseParenthesis(String type){
-    expect(TokenType.OPEN_PARENTHESIS);
+    expect(TokenType.OPEN_PARENTHESIS, "(");
     openParen++;
     while(openParen != 0){
       if(accept(TokenType.OPEN_PARENTHESIS)){
         openParen++;
         switch(type){
-         case "condition" -> {
-            LABEL++;
-            atoms.add(new Atom(Atom.Operation.LBL,"t"+LABEL ));
-            parseCondition();
-          }
-          case "expression" -> parseExpression();
+         case "condition" -> {parseCondition(); break;}
+          case "expression" -> {parseExpression(); break;}
           case "for" -> {
               parseInitialization();
               expect(TokenType.SEMICOLON, ";");
               parseCondition();
               expect(TokenType.SEMICOLON, ";");
               parseUpdate();
-              }
-          case "update" -> parseUpdate();
+              break;
+          }   
+          case "update" -> {parseUpdate(); break;}
         }
       } else if(accept(TokenType.CLOSE_PARENTHESIS))
         openParen--;
@@ -204,33 +201,26 @@ private static boolean isOperator(Token token) {
   }
 
   // Method to parse if statements ~ Brandon
-  private static ArrayList<Atom> parseIf(){
+  private static void parseIf(){
     expect(TokenType.KEYWORD, "if");
     parseParenthesis("condition");
     parseBrackets();
-    if(accept(TokenType.KEYWORD, "else")){
-      if(accept(TokenType.KEYWORD, "if")){
-        atoms.addAll(parseIf());
-      } else {
-        parseBrackets();
-      }
-      parseBrackets();
-    }
-    return atoms;
+    atoms.add(new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++));
   }
 
   // Method to parse while statements ~ Brandon
   private static ArrayList<Atom> parseWhile(){
     parseParenthesis("condition");
     parseBrackets();
+    atoms.add(new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++));
     return atoms;
   }
 
   // Method to parse for statements ~ Brandon
-  private static ArrayList<Atom> parseFor(){
+  private static void parseFor(){
     parseParenthesis("for");
     parseBrackets();
-    return atoms;
+    atoms.add(new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++));
   }
 
   // Method to parse expressions ~ Creek
@@ -310,56 +300,35 @@ private static boolean isOperator(Token token) {
    */
   // Method to parse conditional statements - Tucker
   private static String parseCondition(){
-    
-    String newLabel = "t" + LABEL++;
-    
-    Atom condition;
-
-    String destination = "placeholder";
 
     // case: [] < [] 
     String left = parseOperand();
-    expect(TokenType.OPERATOR);
-    String comparator = parseComparator();
+    int cmp = getComparatorInteger(parseComparator());
     String right = parseOperand();
-
-    
-    int cmp = getComparatorInteger(comparator);
         
-      condition = new Atom(Atom.Operation.TST, left, right, "t"+LABEL, cmp);
-      atoms.add(condition);
-
-
-
       /*
        * need to track conditionals with LBLs so we know locations of conditions being compared in recursive calls
        */
     
      //peek to check for next possible condition: && or ||
-      if ( peek().getTokenType() == Token.TokenType.OPERATOR) 
-      {
-        String operator = peek().value;
-        
-        //validate && or ||
-        if( !(operator.equals("&&") || operator.equals("||")) ) 
-        {
-          throw new RuntimeException("Operator here must be && or ||");
-        }
-      }
-      else
-      {
-        //no more comparators, we are done
-        return;
-      }
+      if (peek().getTokenType() == Token.TokenType.OPERATOR){
+        Atom temp = new Atom(Atom.Operation.TST, left, right, "t"+TEMP_INDEX++);
+        temp.setCMP(cmp);
+        if(accept(Token.TokenType.OPERATOR, "||"))
+          atoms.add(new Atom(Atom.Operation.NEG, temp.checkDestination(), temp.checkDestination()));
+        atoms.add(temp);
 
+        expect(Token.TokenType.OPERATOR, "&&");
+      
+        atoms.add(new Atom(Atom.Operation.TST, temp.checkDestination(), parseCondition(), "LBL"+LABEL_INDEX, cmp));
+      } else {
+        atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL"+LABEL_INDEX, cmp));
+        return "";
+      }
 
       //create atom for Condition '&&' Condition comparison
-
-      parseCondition();
-
-      return tempvariable;
   
-
+      return "";
     }
   /*
       x < y -> t1
