@@ -93,6 +93,7 @@ public class Atom {
     };
   }
 
+
   // Checks the destination of the atom
   public String checkDestination(){
     return this.destination;

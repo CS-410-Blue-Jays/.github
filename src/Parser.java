@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Set;
 
 public class Parser extends Token{
@@ -148,6 +149,23 @@ private static boolean isOperator(Token token) {
   return token != null && token.getTokenType() == TokenType.OPERATOR && ARITHMETIC_OPERATORS.contains(token.value);
 }
 
+
+  // used to convert string "<=" to its corresponding integer representation
+  public static int getComparatorInteger(String comparator)
+  {
+    return switch(comparator){
+      case "==" ->  1; 
+      case "<" ->   2;
+      case ">" ->   3;
+      case "<=" ->  4;
+      case ">=" -> 5;
+      case "!=" -> 6;
+      default -> throw new IllegalArgumentException("Unexpected comparator: " + comparator);
+    };
+
+  }
+
+
   /*
    * The following methods are used to recursively parse the given tokens; starting with the 
    * highest abstract level: parseProgram() until the code is fully translated into simple atoms.
@@ -288,7 +306,9 @@ private static boolean isOperator(Token token) {
     expect(TokenType.OPERATOR);
     String comparator = parseComparator();
     String right = parseOperand();
-    
+
+    //need to figure out how to find a destination to jump to
+    String destination = "placeholder";
     //case: ([] < [] && [] < []) 
 
     /*
@@ -327,29 +347,27 @@ private static boolean isOperator(Token token) {
        // Example (TST, "A", "B", "label", 1) -> If A == B, jump to label
        public Atom(Operation operation, String left, String right, String destination, int comparison){
      */
-    switch(comparator){
-      case "==" -> {
-        // value = parseOperand();
-        condition = new Atom(Atom.Operation.TST, left, right, "label", 1 );
-        atoms.add(condition);
-      } 
-      case "<" -> {
+    
+    int comparison;
 
-      }
+    int cmp = getComparatorInteger(comparator);
         
+      condition = new Atom(Atom.Operation.TST, left, right, "placeholder", comparison);
+      atoms.add(condition);
+
+
+
+      //peek to check for next possible condition
+
+      /*
+       * need to track conditionals with LBLs so we know locations of conditions being compared in recursive calls
+       */
+      if ( peek(Comparator) )
+        parseCondition();
+
     }
-    String right = parseOperand();
 
-    //need to figure out how to find a destination to jump to
-    String destination = "placeholder";
-
-    int comparison = -1;
-
-    //Textbook says that TST atoms only have four attributes
-    condition = new Atom(operation, left, right, destination, comparison);
-
-    atoms.add(condition);
-    }
+ 
 
   // Method to parse comparators
   private static String parseComparator(){
