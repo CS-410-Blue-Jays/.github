@@ -61,7 +61,7 @@ public class Parser extends Token{
   private static void expect(Token.TokenType type, String value){
     if(!accept(type, value))
       throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value + " expected: " + value);
-  } 
+  }
  
   // Helper method to assert a token without it's value
   private static void expect(Token.TokenType type){
@@ -71,7 +71,7 @@ public class Parser extends Token{
 
   // Helper method to move to the next token 
   private static Token advance(){
-    return tokens.get(currentIndex++); //currentIndex++ returns the index after current (note for myself i'm sorry)
+    return tokens.get(currentIndex++);
   }
 
   // Helper method to peek at the next token without advancing
@@ -119,7 +119,7 @@ public class Parser extends Token{
 
 // Sets of available Keywords for types and operators / comparators ~ Creek
 private static final Set<String> ASSIGNMENT_OPERATORS = Set.of("=", "+=", "-=");
-private static final Set<String> COMPARATORS = Set.of(">", "<", ">=", "<=", "==");
+private static final Set<String> COMPARATORS = Set.of("==", "<", ">", "<=", ">=", "!=");
 private static final Set<String> ARITHMETIC_OPERATORS = Set.of("++", "+", "--", "-", "*", "/", "%");
 private static final Set<String> TYPES = Set.of("int", "float");
 
@@ -277,20 +277,26 @@ private static boolean isOperator(Token token) {
     atoms.add(init);
   }
 
-  // Method to parse conditional statements
-  /*
-   * Condition()
-      If accept (Condition() ) ???
-        Expect (comparator)
-        Condition()
-      If accept( operand )
-        expect(comparator)
-        expect(operand)
-   */
+  // Method to parse conditional statements - Tucker
   private static void parseCondition(){
-    parseExpression();
     
-  }
+    Atom condition;
+
+    String left = parseOperand();
+    expect(TokenType.OPERATOR);
+    String comparator = parseComparator();
+    String right = parseOperand();
+
+    //need to figure out how to find a destination to jump to
+    String destination = "placeholder";
+
+    String comparison = " ";
+
+    //Textbook says that TST atoms only have four attributes
+    condition = new Atom(comparator, left, right, destination, comparison);
+
+    atoms.add(condition);
+    }
 
   // Method to parse comparators
   private static String parseComparator(){
