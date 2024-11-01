@@ -21,6 +21,7 @@ public class Parser extends Token{
   }
   
   private static int LABEL = 0;
+  private static int temp = 0;
   private static int currentIndex = 0;
   private static int openBrackets = 0;
   private static int openParen = 0;
@@ -107,7 +108,7 @@ public class Parser extends Token{
         switch(type){
          case "condition" -> {
             LABEL++;
-            atoms.add(new Atom(LBL,"t"+LABEL ));
+            atoms.add(new Atom(Atom.Operation.LBL,"t"+LABEL ));
             parseCondition();
           }
           case "expression" -> parseExpression();
@@ -308,7 +309,7 @@ private static boolean isOperator(Token token) {
    * 
    */
   // Method to parse conditional statements - Tucker
-  private static void parseCondition(){
+  private static String parseCondition(){
     
     String newLabel = "t" + LABEL++;
     
@@ -322,46 +323,10 @@ private static boolean isOperator(Token token) {
     String comparator = parseComparator();
     String right = parseOperand();
 
-    //need to figure out how to find a destination to jump to
-    //case: ([] < [] && [] < []) 
-
-    /*
-      switch(operator){
-        case "=" -> {
-          value = parseOperand();
-          assignment = new Atom(Atom.Operation.MOV, value, identifier);
-          atoms.add(assignment);
-        }
-        case "+=", "-=" -> {
-          value = parseOperand();
-          assignment = new Atom(operator.equals("+=") ? Atom.Operation.ADD : Atom.Operation.SUB, identifier, value, identifier);
-          atoms.add(assignment);
-        }
-      }
-
-      set of comparators
-      COMPARATORS = Set.of("==", "<", ">", "<=", ">=", "!=");
-
-        ;
-
-       x<5
-      (Atom.Operation.TST, x, 5, "LBL1", 2);
-
-      y<3
-      (Atom.Operation.TST, y, 3, "LBL2", 2);
-
-    were going to compare lbl1 to lbl2
-                                              &&
-      (Atom.Operation.[], LBL1, LBL2, LBL3, [&&,||]);
-
-         * // Constructor for condition test operationns ( TST )
-       // Example (TST, "A", "B", "label", 1) -> If A == B, jump to label
-       public Atom(Operation operation, String left, String right, String destination, int comparison){
-     */
     
     int cmp = getComparatorInteger(comparator);
         
-      condition = new Atom(Atom.Operation.TST, left, right, "placeholder", cmp);
+      condition = new Atom(Atom.Operation.TST, left, right, "t"+LABEL, cmp);
       atoms.add(condition);
 
 
@@ -381,17 +346,22 @@ private static boolean isOperator(Token token) {
           throw new RuntimeException("Operator here must be && or ||");
         }
       }
-
-      while(recursiveCallCounter > 0)
+      else
       {
-
+        //no more comparators, we are done
+        return;
       }
+
+
       //create atom for Condition '&&' Condition comparison
-      Atom middle = new Atom(getOperator, T1,T2,T3,&&);
-        
+
       parseCondition();
 
-    /*
+      return tempvariable;
+  
+
+    }
+  /*
       x < y -> t1
       z < j -> t2
 
@@ -399,9 +369,6 @@ private static boolean isOperator(Token token) {
 
      final (x < y && z < j && v < k) -> destination 3
     */
-
-    }
-
  
 
   // Method to parse comparators
