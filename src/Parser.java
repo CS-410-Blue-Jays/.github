@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Set;
 
+import javax.management.RuntimeErrorException;
+
 public class Parser extends Token{
   public static void main(String[] args) {
     tokens.add(new Token(TokenType.KEYWORD, "if"));
@@ -18,6 +20,7 @@ public class Parser extends Token{
     parse(tokens);
   }
   
+  private static int LABEL = 0;
   private static int currentIndex = 0;
   private static int openBrackets = 0;
   private static int openParen = 0;
@@ -102,7 +105,11 @@ public class Parser extends Token{
       if(accept(TokenType.OPEN_PARENTHESIS)){
         openParen++;
         switch(type){
-          case "condition" -> parseCondition();
+         case "condition" -> {
+            LABEL++;
+            atoms.add(new Atom(LBL,"t"+LABEL ));
+            parseCondition();
+          }
           case "expression" -> parseExpression();
           case "for" -> {
               parseInitialization();
@@ -158,8 +165,8 @@ private static boolean isOperator(Token token) {
       case "<" ->   2;
       case ">" ->   3;
       case "<=" ->  4;
-      case ">=" -> 5;
-      case "!=" -> 6;
+      case ">=" ->  5;
+      case "!=" ->  6;
       default -> throw new IllegalArgumentException("Unexpected comparator: " + comparator);
     };
 
@@ -296,10 +303,18 @@ private static boolean isOperator(Token token) {
   }
 
 
+  /*
+   * 
+   * 
+   */
   // Method to parse conditional statements - Tucker
   private static void parseCondition(){
     
+    String newLabel = "t" + LABEL++;
+    
     Atom condition;
+
+    String destination = "placeholder";
 
     // case: [] < [] 
     String left = parseOperand();
@@ -308,7 +323,6 @@ private static boolean isOperator(Token token) {
     String right = parseOperand();
 
     //need to figure out how to find a destination to jump to
-    String destination = "placeholder";
     //case: ([] < [] && [] < []) 
 
     /*
@@ -328,42 +342,63 @@ private static boolean isOperator(Token token) {
       set of comparators
       COMPARATORS = Set.of("==", "<", ">", "<=", ">=", "!=");
 
-      for (i=1; i<=10; i++) j = j/3 ;
-        (MOV, 1,, i)
-        (LBL, L1)
-        (TST, i, 10,, 3, L4) // Branch if i>10
+        ;
 
+       x<5
+      (Atom.Operation.TST, x, 5, "LBL1", 2);
 
-        COMPARATORS
-      case 0 -> "Always";
-      case 1 -> "Equal";
-      case 2 -> "Lesser";
-      case 3 -> "Greater";
-      case 4 -> "LesserOrEqual";
-      case 5 -> "GreaterOrEqual";
-      case 6 -> "NotEqual";
+      y<3
+      (Atom.Operation.TST, y, 3, "LBL2", 2);
+
+    were going to compare lbl1 to lbl2
+                                              &&
+      (Atom.Operation.[], LBL1, LBL2, LBL3, [&&,||]);
 
          * // Constructor for condition test operationns ( TST )
        // Example (TST, "A", "B", "label", 1) -> If A == B, jump to label
        public Atom(Operation operation, String left, String right, String destination, int comparison){
      */
     
-    int comparison;
-
     int cmp = getComparatorInteger(comparator);
         
-      condition = new Atom(Atom.Operation.TST, left, right, "placeholder", comparison);
+      condition = new Atom(Atom.Operation.TST, left, right, "placeholder", cmp);
       atoms.add(condition);
 
 
 
-      //peek to check for next possible condition
-
       /*
        * need to track conditionals with LBLs so we know locations of conditions being compared in recursive calls
        */
-      if ( peek(Comparator) )
-        parseCondition();
+    
+     //peek to check for next possible condition: && or ||
+      if ( peek().getTokenType() == Token.TokenType.OPERATOR) 
+      {
+        String operator = peek().value;
+        
+        //validate && or ||
+        if( !(operator.equals("&&") || operator.equals("||")) ) 
+        {
+          throw new RuntimeException("Operator here must be && or ||");
+        }
+      }
+
+      while(recursiveCallCounter > 0)
+      {
+
+      }
+      //create atom for Condition '&&' Condition comparison
+      Atom middle = new Atom(getOperator, T1,T2,T3,&&);
+        
+      parseCondition();
+
+    /*
+      x < y -> t1
+      z < j -> t2
+
+      1 && 2 -> t3
+
+     final (x < y && z < j && v < k) -> destination 3
+    */
 
     }
 
