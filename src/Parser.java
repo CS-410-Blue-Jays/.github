@@ -46,7 +46,7 @@ public class Parser extends Token{
 
   // Helper method to accept a token with it's value and advance to next token
   private static boolean accept(Token.TokenType type, String value){
-    if(getCurrentToken().type == type && getCurrentToken().value.equals(value)){
+    if(getCurrentToken().type.equals(type) && getCurrentToken().value.equals(value)){
       advance();
       return true;
     } else
@@ -89,13 +89,12 @@ public class Parser extends Token{
     expect(TokenType.OPEN_BRACKET, "{");
     openBrackets++;
     while(openBrackets != 0){
-      if(accept(TokenType.OPEN_BRACKET)){
+      if(accept(TokenType.OPEN_BRACKET))
         openBrackets++;
-        parseProgram();
-      } else {
-        expect(TokenType.CLOSE_BRACKET);
+      else if(accept(TokenType.CLOSE_BRACKET))
         openBrackets--;
-      }
+      else 
+        parseProgram();
     }
   }
 
@@ -197,7 +196,9 @@ private static boolean isOperator(Token token) {
       parseInitialization();
     }else if(getCurrentToken().getTokenType().equals(TokenType.LITERAL) || getCurrentToken().getTokenType().equals(TokenType.IDENTIFIER)){
       parseExpression();
-    }else
+    }else if(accept(TokenType.CLOSE_BRACKET))
+      openBrackets--;
+    else
       throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value);
   }
 
@@ -311,7 +312,7 @@ private static boolean isOperator(Token token) {
        */
     
      //peek to check for next possible condition: && or ||
-      if (peek().getTokenType() == Token.TokenType.OPERATOR){
+      if (getCurrentToken().type.equals(TokenType.OPERATOR)){
         Atom temp = new Atom(Atom.Operation.TST, left, right, "t"+TEMP_INDEX++);
         temp.setCMP(cmp);
         if(accept(Token.TokenType.OPERATOR, "||"))
