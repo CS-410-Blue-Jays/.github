@@ -277,6 +277,12 @@ private static boolean isOperator(Token token) {
     atoms.add(init);
   }
 
+
+  /**
+   * // Constructor for condition test operationns ( TST )
+  // Example (TST, "A", "B", "label", 1) -> If A == B, jump to label
+       public Atom(Operation operation, String left, String right, String destination, int comparison){
+   */
   // Method to parse conditional statements - Tucker
   private static void parseCondition(){
     
@@ -285,15 +291,54 @@ private static boolean isOperator(Token token) {
     String left = parseOperand();
     expect(TokenType.OPERATOR);
     String comparator = parseComparator();
+
+    /*
+     * switch(type){
+          case "condition" -> parseCondition();
+          case "expression" -> parseExpression();
+          case "for" -> {
+              parseInitialization();
+              expect(TokenType.SEMICOLON, ";");
+              parseCondition();
+              expect(TokenType.SEMICOLON, ";");
+              parseUpdate();
+              }
+
+
+
+      switch(operator){
+        case "=" -> {
+          value = parseOperand();
+          assignment = new Atom(Atom.Operation.MOV, value, identifier);
+          atoms.add(assignment);
+        }
+        case "+=", "-=" -> {
+          value = parseOperand();
+          assignment = new Atom(operator.equals("+=") ? Atom.Operation.ADD : Atom.Operation.SUB, identifier, value, identifier);
+          atoms.add(assignment);
+        }
+      }
+
+      set of comparators
+      COMPARATORS = Set.of("==", "<", ">", "<=", ">=", "!=");
+
+     */
+    switch(comparator){
+      case "==" -> {
+
+      } 
+      
+        
+    }
     String right = parseOperand();
 
     //need to figure out how to find a destination to jump to
     String destination = "placeholder";
 
-    String comparison = " ";
+    int comparison = -1;
 
     //Textbook says that TST atoms only have four attributes
-    condition = new Atom(comparator, left, right, destination, comparison);
+    condition = new Atom(operation, left, right, destination, comparison);
 
     atoms.add(condition);
     }
