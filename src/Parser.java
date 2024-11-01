@@ -61,7 +61,7 @@ public class Parser extends Token{
   private static void expect(Token.TokenType type, String value){
     if(!accept(type, value))
       throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value + " expected: " + value);
-  }
+  } 
  
   // Helper method to assert a token without it's value
   private static void expect(Token.TokenType type){
@@ -71,7 +71,7 @@ public class Parser extends Token{
 
   // Helper method to move to the next token 
   private static Token advance(){
-    return tokens.get(currentIndex++);
+    return tokens.get(currentIndex++); //currentIndex++ returns the index after current (note for myself i'm sorry)
   }
 
   // Helper method to peek at the next token without advancing
@@ -278,8 +278,18 @@ private static boolean isOperator(Token token) {
   }
 
   // Method to parse conditional statements
+  /*
+   * Condition()
+      If accept (Condition() ) ???
+        Expect (comparator)
+        Condition()
+      If accept( operand )
+        expect(comparator)
+        expect(operand)
+   */
   private static void parseCondition(){
     parseExpression();
+    
   }
 
   // Method to parse comparators
