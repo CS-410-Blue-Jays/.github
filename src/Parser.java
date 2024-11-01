@@ -282,7 +282,6 @@ private static boolean isOperator(Token token) {
     
     Atom condition;
 
-    //Currently Restricting the operands of a condition to single identifiers or literals
     String left = parseOperand();
     expect(TokenType.OPERATOR);
     String comparator = parseComparator();
