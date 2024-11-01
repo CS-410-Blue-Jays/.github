@@ -278,34 +278,20 @@ private static boolean isOperator(Token token) {
   }
 
 
-  /**
-   * // Constructor for condition test operationns ( TST )
-  // Example (TST, "A", "B", "label", 1) -> If A == B, jump to label
-       public Atom(Operation operation, String left, String right, String destination, int comparison){
-   */
   // Method to parse conditional statements - Tucker
   private static void parseCondition(){
     
     Atom condition;
 
+    // case: [] < [] 
     String left = parseOperand();
     expect(TokenType.OPERATOR);
     String comparator = parseComparator();
+    String right = parseOperand();
+    
+    //case: ([] < [] && [] < []) 
 
     /*
-     * switch(type){
-          case "condition" -> parseCondition();
-          case "expression" -> parseExpression();
-          case "for" -> {
-              parseInitialization();
-              expect(TokenType.SEMICOLON, ";");
-              parseCondition();
-              expect(TokenType.SEMICOLON, ";");
-              parseUpdate();
-              }
-
-
-
       switch(operator){
         case "=" -> {
           value = parseOperand();
@@ -322,12 +308,34 @@ private static boolean isOperator(Token token) {
       set of comparators
       COMPARATORS = Set.of("==", "<", ">", "<=", ">=", "!=");
 
+      for (i=1; i<=10; i++) j = j/3 ;
+        (MOV, 1,, i)
+        (LBL, L1)
+        (TST, i, 10,, 3, L4) // Branch if i>10
+
+
+        COMPARATORS
+      case 0 -> "Always";
+      case 1 -> "Equal";
+      case 2 -> "Lesser";
+      case 3 -> "Greater";
+      case 4 -> "LesserOrEqual";
+      case 5 -> "GreaterOrEqual";
+      case 6 -> "NotEqual";
+
+         * // Constructor for condition test operationns ( TST )
+       // Example (TST, "A", "B", "label", 1) -> If A == B, jump to label
+       public Atom(Operation operation, String left, String right, String destination, int comparison){
      */
     switch(comparator){
       case "==" -> {
-
+        // value = parseOperand();
+        condition = new Atom(Atom.Operation.TST, left, right, "label", 1 );
+        atoms.add(condition);
       } 
-      
+      case "<" -> {
+
+      }
         
     }
     String right = parseOperand();
