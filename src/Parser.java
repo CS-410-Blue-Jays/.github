@@ -1,8 +1,5 @@
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Set;
-
-import javax.management.RuntimeErrorException;
 
 public class Parser extends Token{
   public static void main(String[] args) {
@@ -23,8 +20,6 @@ public class Parser extends Token{
   private static int LABEL_INDEX = 0;
   private static int TEMP_INDEX = 0;
   private static int currentIndex = 0;
-  private static int openBrackets = 0;
-  private static int openParen = 0;
   private static final ArrayList<Atom> atoms = new ArrayList<>();
   private static ArrayList<Token> tokens = new ArrayList<>();
 
@@ -86,41 +81,27 @@ public class Parser extends Token{
 
   // Helper method to parse brackets, keeping track of open brackets vs closed brackets
   private static void parseBrackets(){
-    expect(TokenType.OPEN_BRACKET, "{");
-    openBrackets++;
-    while(openBrackets != 0){
-      if(accept(TokenType.OPEN_BRACKET))
-        openBrackets++;
-      else if(accept(TokenType.CLOSE_BRACKET))
-        openBrackets--;
-      else 
-        parseProgram();
-    }
+    expect(TokenType.OPEN_BRACKET);
+    if(!getCurrentToken().type.equals(TokenType.CLOSE_BRACKET))
+      parseProgram();
+    expect(TokenType.CLOSE_BRACKET);
   }
 
   // Helper method for parsing parenthesis for conditionals/expressions
   private static void parseParenthesis(String type){
     expect(TokenType.OPEN_PARENTHESIS, "(");
-    openParen++;
-    while(openParen != 0){
-      if(accept(TokenType.OPEN_PARENTHESIS))
-        openParen++;
-      else if(accept(TokenType.CLOSE_PARENTHESIS))
-        openParen--;
-      else {
-        switch(type){
-          case "condition" -> parseCondition(0); 
-          case "expression" -> parseExpression(); 
-          case "for" -> {
-              parseInitialization();
-              parseCondition(0);
-              expect(TokenType.SEMICOLON, ";");
-              parseUpdate();
-          }   
-          case "update" -> parseUpdate();
-        }
-      }
+    switch(type){
+      case "condition" -> parseCondition(0);
+      case "expression" -> parseExpression();
+      case "for" -> {
+          parseInitialization();
+          parseCondition(0);
+          expect(TokenType.SEMICOLON, ";"); // Semicolon after condition in for loop
+          parseUpdate();
+      }   
+      case "update" -> parseUpdate();
     }
+    expect(TokenType.CLOSE_PARENTHESIS, ")");
   }
 
 // Sets of available Keywords for types and operators / comparators ~ Creek
@@ -179,12 +160,12 @@ private static boolean isOperator(Token token) {
   // Parse program is the highest level of abstraction, it will parse the entire program ~ Brandon
   private static void parseProgram(){
     parseStatement();
-    if(hasMoreTokens())
+    if(hasMoreTokens() && getCurrentToken().getTokenType() != TokenType.CLOSE_BRACKET)
       parseProgram();
   }
 
   // Parse statement is the second highest level of abstraction, it will parse a single statement ~ Brandon
-  private static void parseStatement(){
+  private static void parseStatement() {
     if(accept(TokenType.KEYWORD, "if"))
       parseIf();
     else if(accept(TokenType.KEYWORD, "while"))
@@ -196,32 +177,32 @@ private static boolean isOperator(Token token) {
       parseInitialization();
     }else if(getCurrentToken().getTokenType().equals(TokenType.LITERAL) || getCurrentToken().getTokenType().equals(TokenType.IDENTIFIER)){
       parseExpression();
-    }else if(accept(TokenType.CLOSE_BRACKET))
-      openBrackets--;
-    else
+    }else 
       throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value);
   }
 
   // Method to parse if statements ~ Brandon
   private static void parseIf(){
+    Atom ifAtom = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
     parseParenthesis("condition");
     parseBrackets();
-    atoms.add(new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++));
+    atoms.add(ifAtom);
   }
 
   // Method to parse while statements ~ Brandon
-  private static ArrayList<Atom> parseWhile(){
+  private static void parseWhile(){
+    Atom whileAtom = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
     parseParenthesis("condition");
     parseBrackets();
-    atoms.add(new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++));
-    return atoms;
+    atoms.add(whileAtom);
   }
 
   // Method to parse for statements ~ Brandon
   private static void parseFor(){
+    Atom forAtom = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
     parseParenthesis("for");
     parseBrackets();
-    atoms.add(new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++));
+    atoms.add(forAtom);
   }
 
   // Method to parse expressions ~ Creek
@@ -340,17 +321,17 @@ private static boolean isOperator(Token token) {
           atoms.add(new Atom(Atom.Operation.NEG, temp.checkResult(), temp.checkResult()));
           String rightCond = parseCondition(1);
           atoms.add(new Atom(Atom.Operation.NEG, rightCond, rightCond));
-          atoms.add(new Atom(Atom.Operation.TST, temp.checkResult(), rightCond, "LBL"+LABEL_INDEX, 6)); // negation !(!x && !y) == x || y
+          atoms.add(new Atom(Atom.Operation.TST, temp.checkResult(), rightCond, "LBL"+LABEL_INDEX++, 6)); // negation !(!x && !y) == x || y
           return "";
         // The AND case
         } else if(accept(Token.TokenType.OPERATOR, "&&")){
-          atoms.add(new Atom(Atom.Operation.TST, temp.checkResult(), parseCondition(1), "LBL"+LABEL_INDEX, 1));
+          atoms.add(new Atom(Atom.Operation.TST, temp.checkResult(), parseCondition(1), "LBL"+LABEL_INDEX++, 1));
         // Finished parsing, add the test atom
         } else {
           
         }
       } else
-        atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL"+LABEL_INDEX, cmp));
+        atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL"+LABEL_INDEX++, cmp));
   
       return "t" + TEMP_INDEX;
     }

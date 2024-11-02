@@ -3,6 +3,9 @@ while(g > 2){
     if(9 < 9 && i < i){
         float i = 0;
         i += (23);
+        for(float j = 10.0; j > 1; j--){
+            
+        }
     }
     g--;
     for(int i = 0; i < input; i++){
