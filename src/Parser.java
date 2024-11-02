@@ -178,8 +178,6 @@ private static boolean isOperator(Token token) {
 
   // Parse program is the highest level of abstraction, it will parse the entire program ~ Brandon
   private static void parseProgram(){
-    for(Atom atom : atoms)
-      System.out.println(atom.toString());
     parseStatement();
     if(hasMoreTokens())
       parseProgram();
@@ -228,9 +226,9 @@ private static boolean isOperator(Token token) {
 
   // Method to parse expressions ~ Creek
   private static void parseExpression(){
-    if(getCurrentToken().value.equals("=") || getCurrentToken().value.equals("+=") || getCurrentToken().value.equals("-=")){
+    if(peek().value.equals("=") || peek().value.equals("+=") || peek().value.equals("-=")){
       parseAssignment();
-    } else if(getCurrentToken().type.equals(TokenType.OPERATOR) && (getCurrentToken().value.equals("++") || getCurrentToken().value.equals("--"))){
+    } else if(peek().type.equals(TokenType.OPERATOR) && (peek().value.equals("++") || peek().value.equals("--"))){
       parseUpdate();
     } else {
       if(getCurrentToken().getTokenType().equals(TokenType.OPERATOR))
@@ -253,22 +251,47 @@ private static boolean isOperator(Token token) {
 
     String operator = parseOperator();
     String value;
+    if(getCurrentToken().getTokenType().equals(TokenType.OPEN_PARENTHESIS)){
+      parseParenthesis("expression");
+      value = "t" + TEMP_INDEX++;
+    } else
+      value = parseOperand();
 
-    switch(operator){
-      case "=" -> {
-        value = parseOperand();
-        assignment = new Atom(Atom.Operation.MOV, value, identifier);
-        atoms.add(assignment);
+    // If there is another operator
+    if(getCurrentToken().getTokenType().equals(TokenType.OPERATOR)){
+      String nextOperator = parseOperator();
+      String nextValue = parseOperand();
+      switch(nextOperator){
+        case "*" -> {
+          assignment = new Atom(Atom.Operation.MUL, value, nextValue, identifier);
+          atoms.add(assignment);
+        }
+        case "/" -> {
+          assignment = new Atom(Atom.Operation.DIV, value, nextValue, identifier);
+          atoms.add(assignment);
+        }
+        case "+" -> {
+          assignment = new Atom(Atom.Operation.ADD, value, nextValue, identifier);
+          atoms.add(assignment);
+        }
+        case "-" -> {
+          assignment = new Atom(Atom.Operation.SUB, value, nextValue, identifier);
+          atoms.add(assignment);
+        }
       }
-      case "+=", "-=" -> {
-        value = parseOperand();
-        assignment = new Atom(operator.equals("+=") ? Atom.Operation.ADD : Atom.Operation.SUB, identifier, value, identifier);
-        atoms.add(assignment);
+    } else {
+      switch(operator){
+        case "=" -> {
+          assignment = new Atom(Atom.Operation.MOV, value, identifier);
+          atoms.add(assignment);
+        }
+        case "+=", "-=" -> {
+          assignment = new Atom(operator.equals("+=") ? Atom.Operation.ADD : Atom.Operation.SUB, identifier, value, identifier);
+          atoms.add(assignment);
+        }
       }
     }
-
-    if(!peek().value.equals(")"))
-      expect(TokenType.SEMICOLON, ";");
+    expect(TokenType.SEMICOLON);
   }
 
   // Method to parse initializations ~ Creek
@@ -287,7 +310,7 @@ private static boolean isOperator(Token token) {
     // Parse the assignment operator
     expect(TokenType.OPERATOR, "=");
 
-    // Parse the left hand side of the assignment
+    // Parse the right hand side of the assignment
     String value = parseOperand();
 
     expect(TokenType.SEMICOLON, ";");
