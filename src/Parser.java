@@ -191,18 +191,24 @@ private static boolean isOperator(Token token) {
 
   // Method to parse while statements ~ Brandon
   private static void parseWhile(){
-    Atom whileAtom = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
+    Atom whileBefore = new Atom(Atom.Operation.LBL,"BEFORE_LBL"+LABEL_INDEX);
+    Atom whileAfter = new Atom(Atom.Operation.LBL,"AFTER_LBL"+LABEL_INDEX);
+    atoms.add(whileBefore); // Add the pre-while label
     parseParenthesis("condition");
     parseBrackets();
-    atoms.add(whileAtom);
+    atoms.add(new Atom(Atom.Operation.JMP, whileBefore.checkDestination())); // Jump back to the pre-while label
+    atoms.add(whileAfter); // Add the post-while label
   }
 
   // Method to parse for statements ~ Brandon
   private static void parseFor(){
-    Atom forAtom = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
+    Atom forBefore = new Atom(Atom.Operation.LBL,"BEFORE_LBL"+LABEL_INDEX);
+    Atom forAfter = new Atom(Atom.Operation.LBL,"AFTER_LBL"+LABEL_INDEX);
+    atoms.add(forBefore); // Add the pre-for label
     parseParenthesis("for");
     parseBrackets();
-    atoms.add(forAtom);
+    atoms.add(new Atom(Atom.Operation.JMP, forBefore.checkDestination())); // Jump back to the pre-for label
+    atoms.add(forAfter); // Add the post-for label
   }
 
   // Method to parse expressions ~ Creek
