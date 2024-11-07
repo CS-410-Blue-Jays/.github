@@ -91,11 +91,11 @@ public class Parser extends Token{
   private static void parseParenthesis(String type){
     expect(TokenType.OPEN_PARENTHESIS, "(");
     switch(type){
-      case "condition" -> parseCondition(0);
+      case "condition" -> parseCondition(false);
       case "expression" -> parseExpression();
       case "for" -> {
           parseInitialization();
-          parseCondition(0);
+          parseCondition(false);
           expect(TokenType.SEMICOLON, ";"); // Semicolon after condition in for loop
           parseUpdate();
       }   
@@ -290,15 +290,15 @@ private static boolean isOperator(Token token) {
     // Parse the identifier (result of the initialization)
     String identifier = parseOperand();
 
-    // Append a decimal if float and not already present
-    if(type.equals("float") && !identifier.contains("."))
-      identifier += ".0";
-
     // Parse the assignment operator
     expect(TokenType.OPERATOR, "=");
 
     // Parse the right hand side of the assignment
     String value = parseOperand();
+
+    // Append a decimal if float and not already present
+    if(type.equals("float") && !value.contains("."))
+      value += ".0";
 
     expect(TokenType.SEMICOLON, ";");
 
@@ -307,40 +307,44 @@ private static boolean isOperator(Token token) {
   }
 
   // Method to parse conditional statements - Tucker
-  private static String parseCondition(int recursion){
-      String left = parseOperand();
-      int cmp = getComparatorInteger(parseComparator());
-      String right = parseOperand();
-        
-      /*
-       * need to track conditionals with LBLs so we know locations of conditions being compared in recursive calls
-       */
-    
-      // peek to check for next possible condition: && or ||
-      if (getCurrentToken().type.equals(TokenType.OPERATOR) || recursion != 0){
-        Atom temp = new Atom(Atom.Operation.TST, left, right, "t" + TEMP_INDEX++);
-        temp.setCMP(cmp);
-        atoms.add(temp);
+  private static String parseCondition(Boolean recursion){
+    String returnName = "";
+    String left = parseOperand();
+    int cmp = getComparatorInteger(parseComparator());
+    String right = parseOperand();
 
-        // The OR case
-        if(accept(Token.TokenType.OPERATOR, "||")){
-          atoms.add(new Atom(Atom.Operation.NEG, temp.checkResult(), temp.checkResult()));
-          String rightCond = parseCondition(1);
-          atoms.add(new Atom(Atom.Operation.NEG, rightCond, rightCond));
-          atoms.add(new Atom(Atom.Operation.TST, temp.checkResult(), rightCond, "LBL"+LABEL_INDEX++, 6)); // negation !(!x && !y) == x || y
-          return "";
-        // The AND case
-        } else if(accept(Token.TokenType.OPERATOR, "&&")){
-          atoms.add(new Atom(Atom.Operation.TST, temp.checkResult(), parseCondition(1), "LBL"+LABEL_INDEX++, 1));
-        // Finished parsing, add the test atom
-        } else {
-          
-        }
-      } else
-        atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL"+LABEL_INDEX++, cmp));
-  
-      return "t" + TEMP_INDEX;
+    if(recursion)
+      returnName = "t" + TEMP_INDEX++;
+
+    // If there are more tokens after the right operand (not closing parenthesis or semicolon), we are not finished
+    if(!getCurrentToken().type.equals(TokenType.CLOSE_PARENTHESIS) && !getCurrentToken().type.equals(TokenType.SEMICOLON)){
+      returnName = "t" + TEMP_INDEX++; // Creates a new temporary variable name to return after the comparison
+      Atom comparison = new Atom(Atom.Operation.TST, left, right, returnName); // Creates a new test atom
+      comparison.setCMP(cmp); // Changes the comparator
+      atoms.add(comparison); // Adds the completed atom
+      
+      // If next token is a logical AND, assert both left and right are equal using case 1
+      if(accept(TokenType.OPERATOR, "&&")){
+        String rightSide = parseCondition(true); // Parse the right side of the condition
+        atoms.add(new Atom(Atom.Operation.TST, returnName, rightSide, returnName, 1)); // Add the right side to the left side
+      // Next token must be logical OR Using DeMorgan's Law to negate both sides of the condition and use case 6 for comparison in the atom
+      } else {
+        expect(TokenType.OPERATOR, "||");
+        atoms.add(new Atom(Atom.Operation.NEG, returnName, returnName)); // Negate the left side
+        String rightSide = parseCondition(true); // Parse the right side of the condition
+        atoms.add(new Atom(Atom.Operation.NEG, rightSide, rightSide)); // Negate the right side
+        if(getCurrentToken().type.equals(TokenType.CLOSE_PARENTHESIS))
+          atoms.add(new Atom(Atom.Operation.TST, returnName, rightSide, "LBL" + LABEL_INDEX, 6)); // Add the right side to the left side
+      }
+    // If there are no more tokens (closing parenthesis), we are finished
+    } else if(!recursion){
+      Atom comparison = new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX, cmp); // Creates a new test atom
+      comparison.setCMP(cmp); // Changes the comparator
+      atoms.add(comparison); // Adds the completed atom
     }
+  
+    return returnName;
+  }
 
   // Method to parse comparators
   private static String parseComparator(){
