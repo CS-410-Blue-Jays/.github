@@ -11,7 +11,6 @@ while(g > 2){
     for(int i = 0; i < input; i++){
         float zb20 = 100;
         zb20 = i * 2;
-        zb20 = zb20 / 10;
         zb20++;
         zb20 -= 2;
     }

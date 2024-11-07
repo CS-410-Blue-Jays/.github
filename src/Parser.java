@@ -191,8 +191,8 @@ private static boolean isOperator(Token token) {
 
   // Method to parse while statements ~ Brandon
   private static void parseWhile(){
-    Atom whileBefore = new Atom(Atom.Operation.LBL,"BEFORE_LBL"+LABEL_INDEX);
-    Atom whileAfter = new Atom(Atom.Operation.LBL,"AFTER_LBL"+LABEL_INDEX);
+    Atom whileBefore = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++);
+    Atom whileAfter = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
     atoms.add(whileBefore); // Add the pre-while label
     parseParenthesis("condition");
     parseBrackets();
@@ -202,8 +202,8 @@ private static boolean isOperator(Token token) {
 
   // Method to parse for statements ~ Brandon
   private static void parseFor(){
-    Atom forBefore = new Atom(Atom.Operation.LBL,"BEFORE_LBL"+LABEL_INDEX);
-    Atom forAfter = new Atom(Atom.Operation.LBL,"AFTER_LBL"+LABEL_INDEX);
+    Atom forBefore = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++);
+    Atom forAfter = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
     atoms.add(forBefore); // Add the pre-for label
     parseParenthesis("for");
     parseBrackets();
@@ -311,6 +311,7 @@ private static boolean isOperator(Token token) {
     String returnName = "";
     String left = parseOperand();
     int cmp = getComparatorInteger(parseComparator());
+    cmp = 7 - cmp; // Invert the comparator
     String right = parseOperand();
 
     if(recursion)
@@ -334,11 +335,11 @@ private static boolean isOperator(Token token) {
         String rightSide = parseCondition(true); // Parse the right side of the condition
         atoms.add(new Atom(Atom.Operation.NEG, rightSide, rightSide)); // Negate the right side
         if(getCurrentToken().type.equals(TokenType.CLOSE_PARENTHESIS))
-          atoms.add(new Atom(Atom.Operation.TST, returnName, rightSide, "LBL" + LABEL_INDEX, 6)); // Add the right side to the left side
+          atoms.add(new Atom(Atom.Operation.TST, returnName, rightSide, "LBL" + LABEL_INDEX++, 6)); // Add the right side to the left side
       }
     // If there are no more tokens (closing parenthesis), we are finished
     } else if(!recursion){
-      Atom comparison = new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX, cmp); // Creates a new test atom
+      Atom comparison = new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX++, cmp); // Creates a new test atom
       comparison.setCMP(cmp); // Changes the comparator
       atoms.add(comparison); // Adds the completed atom
     }
