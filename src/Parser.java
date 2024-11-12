@@ -314,9 +314,6 @@ private static boolean isOperator(Token token) {
     cmp = 7 - cmp; // Invert the comparator
     String right = parseOperand();
 
-    if(recursion)
-      returnName = "t" + TEMP_INDEX++;
-
     // If there are more tokens after the right operand (not closing parenthesis or semicolon), we are not finished
     if(!getCurrentToken().type.equals(TokenType.CLOSE_PARENTHESIS) && !getCurrentToken().type.equals(TokenType.SEMICOLON)){
       returnName = "t" + TEMP_INDEX++; // Creates a new temporary variable name to return after the comparison
@@ -327,7 +324,9 @@ private static boolean isOperator(Token token) {
       // If next token is a logical AND, assert both left and right are equal using case 1
       if(accept(TokenType.OPERATOR, "&&")){
         String rightSide = parseCondition(true); // Parse the right side of the condition
-        atoms.add(new Atom(Atom.Operation.TST, returnName, rightSide, returnName, 1)); // Add the right side to the left side
+        Atom andTest = new Atom(Atom.Operation.TST, returnName, rightSide, returnName);
+        andTest.setCMP(1); // Changes the comparator
+        atoms.add(andTest); // Add the right side to the left side
       // Next token must be logical OR Using DeMorgan's Law to negate both sides of the condition and use case 6 for comparison in the atom
       } else {
         expect(TokenType.OPERATOR, "||");
@@ -342,7 +341,8 @@ private static boolean isOperator(Token token) {
       Atom comparison = new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX++, cmp); // Creates a new test atom
       comparison.setCMP(cmp); // Changes the comparator
       atoms.add(comparison); // Adds the completed atom
-    }
+    } else if(recursion)
+      returnName = "t" + TEMP_INDEX++;
   
     return returnName;
   }
