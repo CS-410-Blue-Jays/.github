@@ -93,6 +93,7 @@ public class Parser extends Token{
       case "expression" -> parseExpression();
       case "for" -> {
           parseInitialization();
+          atoms.add(new Atom(Atom.Operation.LBL, "LBL" + LABEL_INDEX++)); // Add the pre-for label
           parseCondition();
           expect(TokenType.SEMICOLON, ";"); // Semicolon after condition in for loop
           parseUpdate();
@@ -200,12 +201,11 @@ private static boolean isOperator(Token token) {
 
   // Method to parse for statements ~ Brandon
   private static void parseFor(){
-    Atom forBefore = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++);
-    Atom forAfter = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
-    atoms.add(forBefore); // Add the pre-for label
+    String forBefore = "LBL"+LABEL_INDEX;
     parseParenthesis("for");
+    Atom forAfter = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
     parseBrackets();
-    atoms.add(new Atom(Atom.Operation.JMP, forBefore.checkDestination())); // Jump back to the pre-for label
+    atoms.add(new Atom(Atom.Operation.JMP, forBefore)); // Jump back to the pre-for label
     atoms.add(forAfter); // Add the post-for label
   }
 
