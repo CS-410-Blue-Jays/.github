@@ -1,6 +1,6 @@
 int g = 4;
 while(g > 2){
-    if(9 < 9 || i < i && j > 3){
+    if(9 < 9 || i < 10 && i > 3){
         float i = 0;
         i += 23;
         for(float j = 10.0; j > 1; j--){

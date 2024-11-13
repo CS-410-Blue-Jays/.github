@@ -17,9 +17,7 @@ public class Parser extends Token{
     parse(tokens);
   }
   
-  private static int LABEL_INDEX = 0;
-  private static int TEMP_INDEX = 0;
-  private static int currentIndex = 0;
+  private static int LABEL_INDEX, TEMP_INDEX, currentIndex, OR_INDEX = 0;
   private static final ArrayList<Atom> atoms = new ArrayList<>();
   private static ArrayList<Token> tokens = new ArrayList<>();
 
@@ -91,11 +89,11 @@ public class Parser extends Token{
   private static void parseParenthesis(String type){
     expect(TokenType.OPEN_PARENTHESIS, "(");
     switch(type){
-      case "condition" -> parseCondition(false);
+      case "condition" -> parseCondition();
       case "expression" -> parseExpression();
       case "for" -> {
           parseInitialization();
-          parseCondition(false);
+          parseCondition();
           expect(TokenType.SEMICOLON, ";"); // Semicolon after condition in for loop
           parseUpdate();
       }   
@@ -307,8 +305,7 @@ private static boolean isOperator(Token token) {
   }
 
   // Method to parse conditional statements - Tucker
-  private static String parseCondition(Boolean recursion){
-    String returnName = "";
+  private static void parseCondition(){
     String left = parseOperand();
     int cmp = getComparatorInteger(parseComparator());
     cmp = 7 - cmp; // Invert the comparator
@@ -316,35 +313,17 @@ private static boolean isOperator(Token token) {
 
     // If there are more tokens after the right operand (not closing parenthesis or semicolon), we are not finished
     if(!getCurrentToken().type.equals(TokenType.CLOSE_PARENTHESIS) && !getCurrentToken().type.equals(TokenType.SEMICOLON)){
-      returnName = "t" + TEMP_INDEX++; // Creates a new temporary variable name to return after the comparison
-      Atom comparison = new Atom(Atom.Operation.TST, left, right, returnName); // Creates a new test atom
-      comparison.setCMP(cmp); // Changes the comparator
-      atoms.add(comparison); // Adds the completed atom
-      
-      // If next token is a logical AND, assert both left and right are equal using case 1
       if(accept(TokenType.OPERATOR, "&&")){
-        String rightSide = parseCondition(true); // Parse the right side of the condition
-        Atom andTest = new Atom(Atom.Operation.TST, returnName, rightSide, returnName);
-        andTest.setCMP(1); // Changes the comparator
-        atoms.add(andTest); // Add the right side to the left side
-      // Next token must be logical OR Using DeMorgan's Law to negate both sides of the condition and use case 6 for comparison in the atom
+        atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX, cmp)); // Add the current atom
+        parseCondition(); // Recursive call
       } else {
         expect(TokenType.OPERATOR, "||");
-        atoms.add(new Atom(Atom.Operation.NEG, returnName, returnName)); // Negate the left side
-        String rightSide = parseCondition(true); // Parse the right side of the condition
-        atoms.add(new Atom(Atom.Operation.NEG, rightSide, rightSide)); // Negate the right side
-        if(getCurrentToken().type.equals(TokenType.CLOSE_PARENTHESIS))
-          atoms.add(new Atom(Atom.Operation.TST, returnName, rightSide, "LBL" + LABEL_INDEX++, 6)); // Add the right side to the left side
+        atoms.add(new Atom(Atom.Operation.TST, left, right, "OR_" + OR_INDEX, cmp)); // Add the current atom with new label
+        atoms.add(new Atom(Atom.Operation.LBL, "OR_" + OR_INDEX++));
+        parseCondition(); // Recursive call 
       }
-    // If there are no more tokens (closing parenthesis), we are finished
-    } else if(!recursion){
-      Atom comparison = new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX++, cmp); // Creates a new test atom
-      comparison.setCMP(cmp); // Changes the comparator
-      atoms.add(comparison); // Adds the completed atom
-    } else if(recursion)
-      returnName = "t" + TEMP_INDEX++;
-  
-    return returnName;
+    } else
+      atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX, cmp)); // Add the current atom
   }
 
   // Method to parse comparators
