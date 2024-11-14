@@ -48,6 +48,7 @@ public class CodeGen {
             case "LBL" -> parseLBL(curr);
             case "TST" -> parseTST(curr);
             case "MOV" -> parseMOV(curr);
+            default -> throw new RuntimeException("Invalid operation: " + curr.checkOperator());
         }
         advance(); // Move to the next atom
     }
