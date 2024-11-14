@@ -16,7 +16,7 @@ public class Atom {
       case JMP -> "(" + operation + ", , , , " + destination + ")";
       case NEG -> "(" + operation + ", " + left + ", , " + result + ")";
       case LBL -> "(" + operation + ", , , , " + destination + ")";
-      case TST -> "(" + operation + ", " + left + ", " + right + ", " + result + ", " + checkComparator() + ", " + destination + ")";
+      case TST -> "(" + operation + ", " + left + ", " + right + ", " + result + ", " + comparison + ", " + destination + ")";
       case ADD, SUB, MUL, DIV, MOV -> "(" + operation + ", " + left + ", " + right + ", " + result + ")";
     };
   }

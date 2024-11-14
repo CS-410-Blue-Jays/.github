@@ -1,45 +1,71 @@
 public class Code {
-    private final int loc;
-    private final Instruction inst;
-    private final String oper1;
-    private final String oper2;
-    private final String oper3;
+    // Fields for the Code class
+    private final int operation; // Operation code (0-9)
+    private final int compare; // Compare code (1-6)
+    private final int reg; // Register code (hexadecimal)
+    private final int data; // Data code (decimal memory address)
 
-    public enum Instruction {
-        lw, add, sw, jmp
+    // Possible operations for the Mini architecture (In-order: 0-9)
+    public enum Operation {
+        CLR, // Clear Floating-Point Register
+        ADD, // Add Floating-Point Registers
+        SUB, // Subtract Floating-Point Registers
+        MUL, // Multiply Floating-Point Registers
+        DIV, // Divide Floating-Point Registers
+        JMP, // Conditional Branch
+        CMP, // Compare, Set Flag
+        LOD, // Load Floating-Point Register
+        STO, // Store Floating-Point Register
+        HLT  // Halt Processor
     }
 
+    // Need to return a string representation of the Code object
     @Override
     public String toString() {
-        if(oper3.equals(""))
-            return loc + "\t" + inst + "\t" + oper1 + ", " + oper2;
-        else
-            return loc + "\t" + inst + "\t" + oper1 + ", " + oper2 + ", " + oper3;
+        return operation + "" + compare + "" + Integer.toHexString(reg) + "" + data;
     }
 
-    public Code(int Location, String Instruction, String Operand1, String Operand2, String Operand3){
-        this.loc = Location;
-        this.inst = getInstruction(Instruction);
-        this.oper1 = Operand1;
-        this.oper2 = Operand2;
-        this.oper3 = Operand3;
+    // Constructor for the CLR, ADD, SUB, MUL, DIV, LOD, STO instructions
+    public Code(Operation Operation, int Comparator, int Register, int Data){
+        this.operation = getOperation(Operation);
+        this.compare = Comparator;
+        this.reg = Register;
+        this.data = addPadding(Data);
     }
 
-    public Code(int Location, String Instruction, String Operand1, String Operand2){
-        this.loc = Location;
-        this.inst = getInstruction(Instruction);
-        this.oper1 = Operand1;
-        this.oper2 = Operand2;
-        this.oper3 = "";
+    // Constructor for the JMP instruction
+    public Code(Operation Instruction, int Data){
+        this.operation = getOperation(Instruction);
+        this.compare = this.reg = 0; // No compare or register to store
+        this.data = addPadding(Data); 
     }
 
-    public final Instruction getInstruction(String inst){
-        return switch (inst) {
-            case "lw" -> Instruction.lw;
-            case "add" -> Instruction.add;
-            case "sw" -> Instruction.sw;
-            case "jmp" -> Instruction.jmp;
-            default -> throw new IllegalArgumentException("Invalid instruction: " + inst);
+    // Constructor for the HLT instruction
+    public Code(Operation Instruction){
+        this.operation = getOperation(Instruction);
+        this.compare = this.reg = 0; // No compare or register to store
+        this.data = 00000; // No data to store
+    }
+
+    // Returns the operation from a passed Operation
+    public final int getOperation(Operation op){
+        return switch (op) {
+            case CLR -> 0;
+            case ADD -> 1;
+            case SUB -> 2;
+            case MUL -> 3;
+            case DIV -> 4;
+            case JMP -> 5;
+            case CMP -> 6;
+            case LOD -> 7;
+            case STO -> 8;
+            case HLT -> 9;
+            default -> throw new IllegalArgumentException("Invalid instruction: " + op);
         };
+    }
+
+    // Add left-padding to the data until it has 5 places
+    public final int addPadding(int num){
+        return Integer.parseInt(String.format("%05d", num));
     }
 }
