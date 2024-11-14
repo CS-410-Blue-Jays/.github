@@ -12,13 +12,13 @@ public class Atom {
 
   @Override
   public String toString() {
-    switch(operation){
-      case JMP -> { return "(" + operation + ", , , , " + destination + ")"; }
-      case NEG -> { return "(" + operation + ", " + left + ", , " + result + ")"; }
-      case LBL -> { return "(" + operation + ", , , , " + destination + ")"; }
-      case TST -> { return "(" + operation + ", " + left + ", " + right + ", " + result + ", " + checkComparator() + ", " + destination + ")"; }
-      default -> { return "(" + operation + ", " + left + ", " + right + ", " + result + ")"; }
-    }
+    return switch (operation) {
+      case JMP -> "(" + operation + ", , , , " + destination + ")";
+      case NEG -> "(" + operation + ", " + left + ", , " + result + ")";
+      case LBL -> "(" + operation + ", , , , " + destination + ")";
+      case TST -> "(" + operation + ", " + left + ", " + right + ", " + result + ", " + checkComparator() + ", " + destination + ")";
+      case ADD, SUB, MUL, DIV, MOV -> "(" + operation + ", " + left + ", " + right + ", " + result + ")";
+    };
   }
   
   // Constructor for add/sub/mul/div operations

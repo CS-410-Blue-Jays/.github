@@ -6,12 +6,18 @@ import java.util.ArrayList;
 public class Main {
   public static void main(String[] args){
     System.out.println("Enter the name of the file you'd like to tokenize: ");
-		// String path = System.console().readLine();
-		String path = "HelloWorld.txt"; // For testing purposes
-		ArrayList<Token> tokens = new ArrayList<>(); // Its definitely used, quiet down compiler
+		String path = System.console().readLine();
 
+		if(path.equals(""))
+			path = "HelloWorld.txt"; // For testing purposes
+		
+		ArrayList<Token> tokens = new ArrayList<>();
 		File newFile = new File(path);
 
+		if (!newFile.exists())
+			newFile = new File("src/" + path); // Automatically appends src if not in the right location
+
+		// Read the file and tokenize it
 		try (RandomAccessFile file = new RandomAccessFile(newFile.getAbsolutePath(), "r")) {
 			System.out.println("Tokenizing file: '" + newFile.getName() + '\'');
 
@@ -45,8 +51,9 @@ public class Main {
 
 		// Generate Assembly code
 		System.out.println("\nGenerating Assembly code...");
-		CodeGen.genCode(atoms);
-		
+		CodeGen.generate(atoms);
+		for(Code code : CodeGen.code)
+			System.out.println(code.toString());
 		}
     }
 }
