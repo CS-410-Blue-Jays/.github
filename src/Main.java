@@ -41,7 +41,6 @@ public class Main {
 		else {
 			for(Token tok : tokens)
 				System.out.println(tok.toString());
-
 		
 		// Parse the tokens
 		System.out.println("\nParsing tokens...");

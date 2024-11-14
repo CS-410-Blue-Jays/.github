@@ -61,10 +61,8 @@ public class CodeGen {
         currentIndex++;
     }
 
-
     public static void parseADD(Atom current){
 
-        // code.add(new Code(Code.Operation.ADD, current.checkLeft(), current.checkRight(), current.checkResult()));
         // Do things here
 
     }
