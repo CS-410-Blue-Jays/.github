@@ -41,7 +41,6 @@ public class Main {
 		else {
 			for(Token tok : tokens)
 				System.out.println(tok.toString());
-
 		
 		// Parse the tokens
 		System.out.println("\nParsing tokens...");
@@ -49,8 +48,8 @@ public class Main {
 		for(Atom atom : atoms)
 			System.out.println(atom.toString());
 
-		// Generate Assembly code
-		System.out.println("\nGenerating Assembly code...");
+		// Generate Mini code
+		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
 		for(Code code : CodeGen.code)
 			System.out.println(code.toString());

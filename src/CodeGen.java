@@ -63,7 +63,6 @@ public class CodeGen {
 
     public static void parseADD(Atom current){
 
-        System.out.println("ADD detected");
         // Do things here
 
     }
