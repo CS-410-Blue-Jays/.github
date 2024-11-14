@@ -80,8 +80,7 @@ public class Parser extends Token{
   // Helper method to parse brackets, keeping track of open brackets vs closed brackets
   private static void parseBrackets(){
     expect(TokenType.OPEN_BRACKET);
-    if(!getCurrentToken().type.equals(TokenType.CLOSE_BRACKET))
-      parseProgram();
+    parseProgram();
     expect(TokenType.CLOSE_BRACKET);
   }
 
@@ -176,7 +175,7 @@ private static boolean isOperator(Token token) {
       parseInitialization();
     }else if(getCurrentToken().getTokenType().equals(TokenType.LITERAL) || getCurrentToken().getTokenType().equals(TokenType.IDENTIFIER)){
       parseExpression();
-    }else 
+    }else if(!getCurrentToken().getTokenType().equals(TokenType.CLOSE_BRACKET))
       throw new RuntimeException("Unexpected token: " + getCurrentToken().getTokenType() + " with value: " + getCurrentToken().value);
   }
 
@@ -184,29 +183,32 @@ private static boolean isOperator(Token token) {
   private static void parseIf(){
     Atom ifAtom = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
     parseParenthesis("condition");
+    LABEL_INDEX++;
     parseBrackets();
     atoms.add(ifAtom);
   }
 
   // Method to parse while statements ~ Brandon
   private static void parseWhile(){
-    Atom whileBefore = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++);
-    Atom whileAfter = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
-    atoms.add(whileBefore); // Add the pre-while label
+    Atom startLoop = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX++);
+    Atom endLoop = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
+    atoms.add(startLoop); // Add the pre-while label
     parseParenthesis("condition");
+    LABEL_INDEX++;
     parseBrackets();
-    atoms.add(new Atom(Atom.Operation.JMP, whileBefore.checkDestination())); // Jump back to the pre-while label
-    atoms.add(whileAfter); // Add the post-while label
+    atoms.add(new Atom(Atom.Operation.JMP, startLoop.checkDestination())); // Jump back to the pre-while label
+    atoms.add(endLoop); // Add the post-while label
   }
 
   // Method to parse for statements ~ Brandon
   private static void parseFor(){
-    String forBefore = "LBL"+LABEL_INDEX;
+    String startLoop = "LBL"+LABEL_INDEX;
     parseParenthesis("for");
-    Atom forAfter = new Atom(Atom.Operation.LBL,"LBL"+LABEL_INDEX);
+    Atom endLoop = new Atom(Atom.Operation.LBL,"LBL"+ LABEL_INDEX);
+    LABEL_INDEX++;
     parseBrackets();
-    atoms.add(new Atom(Atom.Operation.JMP, forBefore)); // Jump back to the pre-for label
-    atoms.add(forAfter); // Add the post-for label
+    atoms.add(new Atom(Atom.Operation.JMP, startLoop)); // Jump back to the pre-for label
+    atoms.add(endLoop); // Add the post-for label
   }
 
   // Method to parse expressions ~ Creek
