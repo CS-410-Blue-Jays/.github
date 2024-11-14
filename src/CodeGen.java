@@ -4,7 +4,7 @@ public class CodeGen {
 
     // Local test for code generation
     public static void main(String[] args) {
-        ArrayList<Atom> testAtoms = new ArrayList<Atom>();
+        ArrayList<Atom> testAtoms = new ArrayList<>();
         
         testAtoms.add(new Atom(Atom.Operation.MOV, "4", "g"));
         testAtoms.add(new Atom(Atom.Operation.LBL, "LBL0"));

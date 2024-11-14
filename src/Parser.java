@@ -103,32 +103,38 @@ public class Parser extends Token{
   }
 
 // Sets of available Keywords for types and operators / comparators ~ Creek
+@SuppressWarnings("unused")
 private static final Set<String> ASSIGNMENT_OPERATORS = Set.of("=", "+=", "-=");
 private static final Set<String> COMPARATORS = Set.of("==", "<", ">", "<=", ">=", "!=");
 private static final Set<String> ARITHMETIC_OPERATORS = Set.of("++", "+", "--", "-", "*", "/", "%");
 private static final Set<String> TYPES = Set.of("int", "float");
 
 // Helper method to check if it is a type ~ Creek
+@SuppressWarnings("unused")
 private static boolean isType(Token token) {
   return token != null && token.getTokenType() == TokenType.KEYWORD && TYPES.contains(token.value);
 }
 
 // Helper method to check if it is an identifier ~ Creek
+@SuppressWarnings("unused")
 private static boolean isIdentifier(Token token) {
   return token != null && token.getTokenType() == TokenType.IDENTIFIER;
 }
 
 // Helper method to check if it is an operand ~ Creek
+@SuppressWarnings("unused")
 private static boolean isOperand(Token token) {
   return token != null && (token.getTokenType() == TokenType.LITERAL || token.getTokenType() == TokenType.IDENTIFIER);
 }
 
 // Helper method to check if it is a comparator ~ Creek
+@SuppressWarnings("unused")
 private static boolean isComparator(Token token) {
   return token != null && token.getTokenType() == TokenType.OPERATOR && COMPARATORS.contains(token.value);
 }
 
 // Helper method to check if it is an operator ~ Creek
+@SuppressWarnings("unused")
 private static boolean isOperator(Token token) {
   return token != null && token.getTokenType() == TokenType.OPERATOR && ARITHMETIC_OPERATORS.contains(token.value);
 }
