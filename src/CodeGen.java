@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CodeGen {
 
@@ -20,11 +21,22 @@ public class CodeGen {
     static int currentIndex = 0; // Current place in atoms
     static ArrayList<Code> code = new ArrayList<>(); // Return this
     static ArrayList<Atom> atoms = new ArrayList<>(); // Input
+    static int register = 0; // Register Starting at 0
+    static HashMap<String, String> variableRegisterMap = new HashMap<>();
 
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
         parseCode();
         return code;
+    }
+    public static String getOrAssignRegister(String variable) {
+        if (variableRegisterMap.containsKey(variable)) {
+            return variableRegisterMap.get(variable);
+        } else {
+            String newRegister = String.format("%05d", register++);
+            variableRegisterMap.put(variable, newRegister);
+            return newRegister;
+        }
     }
 
     public static void parseCode(){
@@ -35,6 +47,7 @@ public class CodeGen {
     public static boolean hasMoreAtoms(){
         return currentIndex < atoms.size();
     }
+
 
     public static void parseAtom(){
         Atom curr = getCurrentAtom();
@@ -52,7 +65,9 @@ public class CodeGen {
         }
         advance(); // Move to the next atom
     }
-
+    public static int allocateRegister(int operand){
+        return register++;
+    }
     public static Atom getCurrentAtom(){
         return atoms.get(currentIndex);
     }
@@ -63,21 +78,30 @@ public class CodeGen {
 
     public static void parseADD(Atom current){
 
+        System.out.println("ADD detected");
         // Do things here
 
     }
 
-    public static void parseSUB(Atom current){
-
+    public static void parseSUB(Atom current) {
         System.out.println("SUB detected");
-        // Do things here
-
+        String leftRegister = getOrAssignRegister(current.checkLeft());
+        String resultRegister = getOrAssignRegister(current.checkResult());
+        int operation = Code.Operation.SUB.ordinal();
+        Code newInstruction = new Code(operation, 0, Integer.parseInt(resultRegister), Integer.parseInt(leftRegister));
+        code.add(newInstruction);
     }
 
-    public static void parseMUL(Atom current){
+    public static void parseMUL(Atom current){ // ~ Steven
 
-        System.out.println("MUL detected");
-        // Do things here
+        System.out.println("MUL detected"); // Testing Purposes
+        int operation = Code.Operation.MUL.ordinal();
+        int mode = 0;
+        int r = Integer.parseInt(current.checkResult());
+        int a = Integer.parseInt(current.checkLeft());
+        Code newInstruction = new Code(operation, mode, r, a);
+        code.add(newInstruction);
+        
 
     }
 
