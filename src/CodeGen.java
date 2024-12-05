@@ -64,8 +64,11 @@ public class CodeGen {
 
     public static void parseADD(Atom current){
 
-        System.out.println("ADD detected");
-        // Do things here
+        int operation = Code.Operation.ADD.ordinal();
+        int reg = parseReg(current.checkResult());
+        int data = parseReg(current.checkRight());
+        Code newInstruction = new Code(operation, 0, reg, data);
+        code.add(newInstruction);
 
     }
 
@@ -88,10 +91,11 @@ public class CodeGen {
     }
 
     public static void parseDIV(Atom current){
-
-        System.out.println("DIV detected");
-        // Do things here
-
+        int operation = Code.Operation.DIV.ordinal();
+        int reg = parseReg(current.checkResult());
+        int data = parseReg(current.checkRight());
+        Code newInstruction = new Code(operation, 0, reg, data);
+        code.add(newInstruction);
     }
 
     public static void parseJMP(Atom current){
