@@ -25,10 +25,18 @@ public class Code {
         return operation + "" + compare + "" + Integer.toHexString(reg)+ "" + addPadding(data);
     }
 
-    // Constructor for the CLR, ADD, SUB, MUL, DIV, LOD, STO instructions
+    // Constructor for the CMP instruction
     public Code(int Operation, int Comparator, int Register, int Data){
         this.operation = Operation;
         this.compare = Comparator;
+        this.reg = Register;
+        this.data = Data;
+    }
+
+    // Constructor for the CLR, ADD, SUB, MUL, DIV, LOD, STO instructions
+    public Code(int Operation, int Register, int Data){
+        this.operation = Operation;
+        this.compare = 0; // No compare
         this.reg = Register;
         this.data = Data;
     }

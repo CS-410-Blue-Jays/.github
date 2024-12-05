@@ -62,34 +62,30 @@ public class CodeGen {
     }
 
     public static void parseADD(Atom current){ // ~ Brandon
-        int left = parseReg(current.checkLeft());
-        int right = parseReg(current.checkRight());
+        int data = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
-        Code newInstruction = new Code(Code.Operation.ADD.ordinal(), 0, reg, left + right);
+        Code newInstruction = new Code(Code.Operation.ADD.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
     public static void parseSUB(Atom current) { // ~ Steven
-        int left = parseReg(current.checkLeft());
-        int right = parseReg(current.checkRight());
+        int data = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
-        Code newInstruction = new Code(Code.Operation.SUB.ordinal(), 0, reg, left - right);
+        Code newInstruction = new Code(Code.Operation.SUB.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
     public static void parseMUL(Atom current){ // ~ Steven
-        int left = parseReg(current.checkLeft());
-        int right = parseReg(current.checkRight());
+        int data = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
-        Code newInstruction = new Code(Code.Operation.MUL.ordinal(), 0, reg, left * right);
+        Code newInstruction = new Code(Code.Operation.MUL.ordinal(), reg, data);
         code.add(newInstruction);        
     }
 
     public static void parseDIV(Atom current){ // ~ Tucker
-        int left = parseReg(current.checkLeft());
-        int right = parseReg(current.checkRight());
+        int data = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
-        Code newInstruction = new Code(Code.Operation.DIV.ordinal(), 0, reg, left / right);
+        Code newInstruction = new Code(Code.Operation.DIV.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
@@ -117,7 +113,7 @@ public class CodeGen {
     public static void parseMOV(Atom current){ // ~ Brandon
         int data = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
-        Code newInstruction = new Code(Code.Operation.DIV.ordinal(), 0, reg, data);
+        Code newInstruction = new Code(Code.Operation.LOD.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
@@ -129,7 +125,7 @@ public class CodeGen {
 
         // Second, check if the variable name already has an associated register
         if(vars.contains(reg)){
-            return vars.indexOf(reg);
+            return vars.indexOf(reg) - 1;
         } else if (vars.size() != 16){
             vars.add(reg);
             return vars.indexOf(reg);
