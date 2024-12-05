@@ -52,9 +52,19 @@ public class Main {
 		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
 		int loc = 0;
-		System.out.println("Loc\tContents");
-		for(Code code : CodeGen.code)
-			System.out.println(loc++ + "\t" + code.toString() + "\t" + code.checkOperation());
+		
+		Boolean legible = true;
+		if(legible){
+			System.out.println("Loc\tContents");
+			for(Code code : CodeGen.code){
+				if(!code.checkOperation().equals("HLT"))
+					System.out.println(loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation());
+				else 
+					System.out.println(loc++ + "\t" + code.toString() + "\tStop\t" + code.checkOperation());
+				}
+			} else 
+				for(Code code : CodeGen.code)
+					System.out.println(code.toString());
 		}
     }
 }
