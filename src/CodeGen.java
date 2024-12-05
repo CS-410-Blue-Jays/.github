@@ -45,7 +45,6 @@ public class CodeGen {
             case "MUL" -> parseMUL(curr);
             case "DIV" -> parseDIV(curr);
             case "JMP" -> parseJMP(curr);
-            case "NEG" -> parseNEG(curr);
             case "LBL" -> parseLBL(curr);
             case "TST" -> parseTST(curr);
             case "MOV" -> parseMOV(curr);
@@ -62,55 +61,41 @@ public class CodeGen {
         currentAtom++;
     }
 
-    public static void parseADD(Atom current){
-
-        System.out.println("ADD detected");
-        // Do things here
-
+    public static void parseADD(Atom current){ // ~ Brandon
+        int left = parseReg(current.checkLeft());
+        int right = parseReg(current.checkRight());
+        int reg = parseReg(current.checkResult());
+        Code newInstruction = new Code(Code.Operation.ADD.ordinal(), 0, reg, left + right);
+        code.add(newInstruction);
     }
 
     public static void parseSUB(Atom current) { // ~ Steven
-
-        int operation = Code.Operation.SUB.ordinal();
+        int left = parseReg(current.checkLeft());
+        int right = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
-        int data = parseReg(current.checkRight());
-        Code newInstruction = new Code(operation, 0, reg, data);
+        Code newInstruction = new Code(Code.Operation.SUB.ordinal(), 0, reg, left - right);
         code.add(newInstruction);
     }
 
     public static void parseMUL(Atom current){ // ~ Steven
-
-        int operation = Code.Operation.MUL.ordinal();
+        int left = parseReg(current.checkLeft());
+        int right = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
-        int data = parseReg(current.checkRight());
-        Code newInstruction = new Code(operation, 0, reg, data);
+        Code newInstruction = new Code(Code.Operation.MUL.ordinal(), 0, reg, left * right);
         code.add(newInstruction);        
     }
 
-    public static void parseDIV(Atom current){
-
-        System.out.println("DIV detected");
-        // Do things here
-
-        String leftRegister = getOrAssignRegister(current.checkLeft());
-        String resultRegister = getOrAssignRegister(current.checkResult());
-        int operation = Code.Operation.DIV.ordinal();
-        int comparison = 0;
-        Code newInstruction = new Code(operation, 0, Integer.parseInt(resultRegister), Integer.parseInt(leftRegister));
+    public static void parseDIV(Atom current){ // ~ Tucker
+        int left = parseReg(current.checkLeft());
+        int right = parseReg(current.checkRight());
+        int reg = parseReg(current.checkResult());
+        Code newInstruction = new Code(Code.Operation.DIV.ordinal(), 0, reg, left / right);
         code.add(newInstruction);
-
     }
 
     public static void parseJMP(Atom current){
 
         System.out.println("JMP detected");
-        // Do things here
-
-    }
-
-    public static void parseNEG(Atom current){
-
-        System.out.println("NEG detected");
         // Do things here
 
     }
@@ -129,11 +114,11 @@ public class CodeGen {
 
     }
 
-    public static void parseMOV(Atom current){
-
-        System.out.println("MOV detected");
-        // Do things here
-
+    public static void parseMOV(Atom current){ // ~ Brandon
+        int data = parseReg(current.checkRight());
+        int reg = parseReg(current.checkResult());
+        Code newInstruction = new Code(Code.Operation.DIV.ordinal(), 0, reg, data);
+        code.add(newInstruction);
     }
 
     public static int parseReg(String reg){
