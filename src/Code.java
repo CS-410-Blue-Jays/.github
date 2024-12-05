@@ -42,15 +42,15 @@ public class Code {
     }
 
     // Constructor for the JMP instruction
-    public Code(Operation Instruction, int Data){
-        this.operation = getOperation(Instruction);
+    public Code(int Operation, int Data){
+        this.operation = Operation;
         this.compare = this.reg = 0; // No compare or register to store
         this.data = Data; 
     }
 
     // Constructor for the HLT instruction
-    public Code(Operation Instruction){
-        this.operation = getOperation(Instruction);
+    public Code(int Operation){
+        this.operation = Operation;
         this.compare = this.reg = 0; // No compare or register to store
         this.data = 00000; // No data to store
     }
@@ -75,5 +75,9 @@ public class Code {
     // Add left-padding to the data until it has 5 places
     public final String addPadding(int num){
         return String.format("%05d", num);
+    }
+
+    public final String checkOperation(){
+        return Operation.values()[operation].name();
     }
 }

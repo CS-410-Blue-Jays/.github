@@ -31,6 +31,7 @@ public class CodeGen {
     public static void parseCode(){
         while(hasMoreAtoms())
             parseAtom();
+        code.add(new Code(Code.Operation.HLT.ordinal())); // Add the HALT instruction at the end
     }
 
     public static boolean hasMoreAtoms(){
@@ -90,10 +91,9 @@ public class CodeGen {
     }
 
     public static void parseJMP(Atom current){
-
-        System.out.println("JMP detected");
-        // Do things here
-
+        int data = parseReg(current.checkRight()); // Destination
+        Code newInstruction = new Code(Code.Operation.JMP.ordinal(), data); // Make the instruction
+        code.add(newInstruction);
     }
 
     public static void parseLBL(Atom current){
@@ -104,9 +104,12 @@ public class CodeGen {
     }
 
     public static void parseTST(Atom current){
-
-        System.out.println("TST detected");
-        // Do things here
+        int data = parseReg(current.checkRight());
+        int cmp = parseReg(current.checkComparator());
+        int reg = parseReg(current.checkResult());
+        Code newInstruction = new Code(Code.Operation.CMP.ordinal(), cmp, reg, data);
+        code.add(new Code(Code.Operation.LOD.ordinal(), reg, parseReg(current.checkLeft())));
+        code.add(newInstruction);
 
     }
 
