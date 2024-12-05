@@ -92,6 +92,13 @@ public class CodeGen {
         System.out.println("DIV detected");
         // Do things here
 
+        String leftRegister = getOrAssignRegister(current.checkLeft());
+        String resultRegister = getOrAssignRegister(current.checkResult());
+        int operation = Code.Operation.DIV.ordinal();
+        int comparison = 0;
+        Code newInstruction = new Code(operation, 0, Integer.parseInt(resultRegister), Integer.parseInt(leftRegister));
+        code.add(newInstruction);
+
     }
 
     public static void parseJMP(Atom current){
