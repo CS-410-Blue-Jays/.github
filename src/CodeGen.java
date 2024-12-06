@@ -131,7 +131,6 @@ public class CodeGen {
         if(vars.contains(reg)){
             return vars.indexOf(reg);
         } else if (vars.size() != 16){
-            System.out.println(reg + " " + vars.size());
             vars.add(reg);
             return vars.indexOf(reg);
         } else {
