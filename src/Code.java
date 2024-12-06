@@ -23,7 +23,27 @@ public class Code {
     }
 
     public String toBinaryString(){
-        return Long.toBinaryString(code);
+
+        String num = Long.toString(code);
+        String out = "";
+
+        for(int i = 0; i < num.length(); i++){
+            out += switch (num.charAt(i)) {
+                case '0' -> "0000 ";
+                case '1' -> "0001 ";
+                case '2' -> "0010 ";
+                case '3' -> "0011 ";
+                case '4' -> "0100 ";
+                case '5' -> "0101 ";
+                case '6' -> "0110 ";
+                case '7' -> "0111 ";
+                case '8' -> "1000 ";
+                case '9' -> "1001 ";
+                default -> "";
+            };
+        }
+
+        return out;
     }
 
     // Constructor for the CMP instruction
