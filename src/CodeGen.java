@@ -31,10 +31,13 @@ public class CodeGen {
     }
 
     public static void parseCode(){
-        for(Atom a : atoms){
-            if(a.checkOperator().equals("LBL"))
-                parseAtom();
+        // First pass, read all labels
+        for(Atom atom : atoms){
+            if(atom.checkOperator().equals("LBL"))
+                parseLBL(atom);
         }
+
+        // Second pass, read all instructions
         while(hasMoreAtoms())
             parseAtom();
         code.add(new Code(Code.Operation.HLT.ordinal())); // Add the HALT instruction at the end
@@ -111,6 +114,7 @@ public class CodeGen {
         int reg = parseReg(current.checkLeft());
         Code newInstruction = new Code(Code.Operation.CMP.ordinal(), current.checkComparatorNum(), reg, data);
         code.add(newInstruction);
+        code.add(new Code(Code.Operation.JMP.ordinal(), findLocation(current.checkDestination())));
     }
 
     public static void parseMOV(Atom current){ // ~ Brandon
