@@ -1,13 +1,6 @@
 b += 3;
-// Hello
 
-
-/* example
- multiline
- comment */
-int x = 0;
-
-if (x == 3){
+if(i == 3){
     for(int i = 0; i < 10 && j > 2; i++){
 
     }
