@@ -52,9 +52,17 @@ public class Main {
 		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
 		int loc = 0;
+
 		
-		Boolean legible = true;
-		if(legible){
+		System.out.println("Would you like the results to be human-legible? (y/n)");
+		String legible = System.console().readLine();
+
+		while(!legible.equals("y") && !legible.equals("n")){
+			System.out.println("Please enter 'y' or 'n'");
+			legible = System.console().readLine();
+		}
+
+		if(legible.equals("y")){
 			System.out.println("Loc\tContents");
 			for(Code code : CodeGen.code){
 				if(!code.checkOperation().equals("HLT"))
@@ -64,7 +72,7 @@ public class Main {
 				}
 			} else 
 				for(Code code : CodeGen.code)
-					System.out.println(code.toString());
+					System.out.println(code.toBinaryString());
 		}
     }
 }

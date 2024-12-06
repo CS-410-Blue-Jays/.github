@@ -22,6 +22,10 @@ public class Code {
         return Long.toString(code);
     }
 
+    public String toBinaryString(){
+        return Long.toBinaryString(code);
+    }
+
     // Constructor for the CMP instruction
     public Code(int Operation, int Comparator, int Register, int Data){
         this.code = Operation * 10000000 + Comparator * 1000000 + Register * 100000 + Data;
