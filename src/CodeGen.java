@@ -29,6 +29,21 @@ public class CodeGen {
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
         parseCode();
+
+        System.out.println(x:"\nLABEL TABLE\n");
+        System.out.println(x:"LBL\tLocation");
+        for(String label : label_table.keySet())
+        {
+            System.out.println(label + "\t" + label_table.get(label));
+        }
+        
+        System.out.println(x:"\nVARIABLE TABLE\n");
+        System.out.println(x:"VAR\tLocation");
+        for(String var : variable_table.keySet())
+        {
+            System.out.println(var + "\t" + variable_table.get(var));
+        }
+
         return code;
     }
 
@@ -139,7 +154,7 @@ public class CodeGen {
             return vars.indexOf(reg);
         } else if (vars.size() != 16){
             vars.add(reg);
-            variable_table.add(reg, programCounter);
+            variable_table.put(reg, programCounter);
             System.out.println("Adding variable " +reg+ " at location " +programCounter);
             return vars.indexOf(reg);
         } else {
