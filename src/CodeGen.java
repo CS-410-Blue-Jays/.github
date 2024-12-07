@@ -19,10 +19,12 @@ public class CodeGen {
     }
 
     static int currentAtom = 0; // Current place in atoms
+    static int programCounter = 0; //Program Counter
     static ArrayList<Code> code = new ArrayList<>(); // Return this
     static ArrayList<Atom> atoms = new ArrayList<>(); // Input
     static ArrayList<String> vars = new ArrayList<>(); // Register numbers with variable names
     static HashMap<String, Integer> label_table = new HashMap<>(); // Table of all labels
+    static HashMap<String, Integer> variable_table = new HashMap<>(); // Table of all variables
 
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
@@ -60,6 +62,7 @@ public class CodeGen {
             case "MOV" -> parseMOV(curr);
             default -> throw new RuntimeException("Invalid operation: " + curr.checkOperator());
         }
+        programCounter++;
         advance(); // Move to the next atom
     }
 
@@ -136,6 +139,7 @@ public class CodeGen {
             return vars.indexOf(reg);
         } else if (vars.size() != 16){
             vars.add(reg);
+            variable_table.add(reg, programCounter);
             return vars.indexOf(reg);
         } else {
             // If not, check if there are any available registers
