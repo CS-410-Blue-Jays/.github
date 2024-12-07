@@ -27,6 +27,15 @@ public class CodeGen {
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
         parseCode();
+
+        System.out.println("\nLABEL TABLE\n");
+        System.out.println("LBL\tLocation");
+        for(String label : label_table.keySet())
+        {
+            System.out.println(label + "\t" + label_table.get(label));
+        }
+
+        
         return code;
     }
 
