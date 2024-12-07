@@ -140,6 +140,7 @@ public class CodeGen {
         } else if (vars.size() != 16){
             vars.add(reg);
             variable_table.add(reg, programCounter);
+            System.out.println("Adding variable " +reg+ " at location " +programCounter);
             return vars.indexOf(reg);
         } else {
             // If not, check if there are any available registers
