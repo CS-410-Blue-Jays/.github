@@ -30,15 +30,15 @@ public class CodeGen {
         atoms = insertedAtoms;
         parseCode();
 
-        System.out.println(x:"\nLABEL TABLE\n");
-        System.out.println(x:"LBL\tLocation");
+        System.out.println("\nLABEL TABLE\n");
+        System.out.println("LBL\tLocation");
         for(String label : label_table.keySet())
         {
             System.out.println(label + "\t" + label_table.get(label));
         }
         
-        System.out.println(x:"\nVARIABLE TABLE\n");
-        System.out.println(x:"VAR\tLocation");
+        System.out.println("\nVARIABLE TABLE\n");
+        System.out.println("VAR\tLocation");
         for(String var : variable_table.keySet())
         {
             System.out.println(var + "\t" + variable_table.get(var));
