@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CodeGen {
 
@@ -17,23 +18,50 @@ public class CodeGen {
         CodeGen.generate(testAtoms);
     }
 
-    static int currentIndex = 0; // Current place in atoms
+    static int currentAtom = 0; // Current place in atoms
+    static int programCounter = 0; //Program Counter
     static ArrayList<Code> code = new ArrayList<>(); // Return this
     static ArrayList<Atom> atoms = new ArrayList<>(); // Input
+    static ArrayList<String> vars = new ArrayList<>(); // Register numbers with variable names
+    static HashMap<String, Integer> label_table = new HashMap<>(); // Table of all labels
+    static HashMap<String, Integer> variable_table = new HashMap<>(); // Table of all variables
 
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
         parseCode();
+
+        System.out.println("\nLABEL TABLE\n");
+        System.out.println("LBL\tLocation");
+        for(String label : label_table.keySet())
+        {
+            System.out.println(label + "\t" + label_table.get(label));
+        }
+        
+        System.out.println("\nVARIABLE TABLE\n");
+        System.out.println("VAR\tLocation");
+        for(String var : variable_table.keySet())
+        {
+            System.out.println(var + "\t" + variable_table.get(var));
+        }
+
         return code;
     }
 
     public static void parseCode(){
+        // First pass, read all labels
+        for(Atom atom : atoms){
+            if(atom.checkOperator().equals("LBL"))
+                parseLBL(atom);
+        }
+
+        // Second pass, read all instructions
         while(hasMoreAtoms())
             parseAtom();
+        code.add(new Code(Code.Operation.HLT.ordinal())); // Add the HALT instruction at the end
     }
 
     public static boolean hasMoreAtoms(){
-        return currentIndex < atoms.size();
+        return currentAtom < atoms.size();
     }
 
     public static void parseAtom(){
@@ -44,82 +72,102 @@ public class CodeGen {
             case "MUL" -> parseMUL(curr);
             case "DIV" -> parseDIV(curr);
             case "JMP" -> parseJMP(curr);
-            case "NEG" -> parseNEG(curr);
             case "LBL" -> parseLBL(curr);
             case "TST" -> parseTST(curr);
             case "MOV" -> parseMOV(curr);
             default -> throw new RuntimeException("Invalid operation: " + curr.checkOperator());
         }
+        programCounter++;
         advance(); // Move to the next atom
     }
 
     public static Atom getCurrentAtom(){
-        return atoms.get(currentIndex);
+        return atoms.get(currentAtom);
     }
 
     public static void advance(){
-        currentIndex++;
+        currentAtom++;
     }
 
-    public static void parseADD(Atom current){
-
-        // Do things here
-
+    public static void parseADD(Atom current){ // ~ Brandon
+        int data = parseReg(current.checkRight());
+        int reg = parseReg(current.checkLeft());
+        Code newInstruction = new Code(Code.Operation.ADD.ordinal(), reg, data);
+        code.add(newInstruction);
     }
 
-    public static void parseSUB(Atom current){
-
-        System.out.println("SUB detected");
-        // Do things here
-
+    public static void parseSUB(Atom current) { // ~ Steven
+        int data = parseReg(current.checkRight());
+        int reg = parseReg(current.checkLeft());
+        Code newInstruction = new Code(Code.Operation.SUB.ordinal(), reg, data);
+        code.add(newInstruction);
     }
 
-    public static void parseMUL(Atom current){
-
-        System.out.println("MUL detected");
-        // Do things here
-
+    public static void parseMUL(Atom current){ // ~ Steven
+        int data = parseReg(current.checkRight());
+        int reg = parseReg(current.checkLeft());
+        Code newInstruction = new Code(Code.Operation.MUL.ordinal(), reg, data);
+        code.add(newInstruction);        
     }
 
-    public static void parseDIV(Atom current){
-
-        System.out.println("DIV detected");
-        // Do things here
-
+    public static void parseDIV(Atom current){ // ~ Tucker
+        int data = parseReg(current.checkRight());
+        int reg = parseReg(current.checkLeft());
+        Code newInstruction = new Code(Code.Operation.DIV.ordinal(), reg, data);
+        code.add(newInstruction);
     }
 
     public static void parseJMP(Atom current){
-
-        System.out.println("JMP detected");
-        // Do things here
-
-    }
-
-    public static void parseNEG(Atom current){
-
-        System.out.println("NEG detected");
-        // Do things here
-
+        int data = findLocation(current.checkDestination()); // Destination
+        Code newInstruction = new Code(Code.Operation.JMP.ordinal(), data); // Make the instruction
+        code.add(newInstruction);
     }
 
     public static void parseLBL(Atom current){
-
-        System.out.println("LBL detected");
-        // Do things here
-
+        label_table.put(current.checkDestination(), atoms.indexOf(current)); // Add the label to the table
     }
 
     public static void parseTST(Atom current){
-
-        System.out.println("TST detected");
-        // Do things here
-
+        int data = parseReg(current.checkRight());
+        int reg = parseReg(current.checkLeft());
+        Code newInstruction = new Code(Code.Operation.CMP.ordinal(), current.checkComparatorNum(), reg, data);
+        code.add(newInstruction);
+        code.add(new Code(Code.Operation.JMP.ordinal(), findLocation(current.checkDestination())));
     }
 
-    public static void parseMOV(Atom current){
+    public static void parseMOV(Atom current){ // ~ Brandon
+        int data = parseReg(current.checkLeft());
+        int reg = parseReg(current.checkResult());
+        Code newInstruction = new Code(Code.Operation.LOD.ordinal(), reg, data);
+        code.add(newInstruction);
+    }
 
-        System.out.println("MOV detected");
-        // Do things here
+    // Return the register number of the variable, or the literal
+    public static int parseReg(String reg){
+        // First, check if it is a variable or a literal
+        try {
+            return Integer.parseInt(reg);
+        } catch (NumberFormatException e) {}
 
+        // Second, check if the variable name already has an associated register
+        if(vars.contains(reg)){
+            return vars.indexOf(reg);
+        } else if (vars.size() != 16){
+            vars.add(reg);
+            variable_table.put(reg, programCounter);
+            System.out.println("Adding variable " +reg+ " at location " +programCounter);
+            return vars.indexOf(reg);
+        } else {
+            // If not, check if there are any available registers
+            throw new RuntimeException("No available registers");
+        }
+    }
+
+    // Find the destination of a label in the label_table
+    public static int findLocation(String label){
+        if(label_table.containsKey(label))
+            return label_table.get(label);
+        else
+            throw new RuntimeException("Label not found: " + label);
     }
 }

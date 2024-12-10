@@ -51,8 +51,28 @@ public class Main {
 		// Generate Mini code
 		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
-		for(Code code : CodeGen.code)
-			System.out.println(code.toString());
+		int loc = 0;
+
+		
+		System.out.println("Would you like the results to be human-legible? (y/n)");
+		String legible = System.console().readLine();
+
+		while(!legible.equals("y") && !legible.equals("n")){
+			System.out.println("Please enter 'y' or 'n'");
+			legible = System.console().readLine();
+		}
+
+		if(legible.equals("y")){
+			System.out.println("Loc\tContents");
+			for(Code code : CodeGen.code){
+				if(!code.checkOperation().equals("HLT"))
+					System.out.println(loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation());
+				else 
+					System.out.println(loc++ + "\t" + code.toString() + "\tStop\t" + code.checkOperation());
+				}
+			} else 
+				for(Code code : CodeGen.code)
+					System.out.println(code.toBinaryString());
 		}
     }
 }
