@@ -1,6 +1,8 @@
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import javax.swing.*;
+import java.nio.charset.StandardCharsets;import javax.swing.*;
 
 public class Main {
   public static void main(String[] args){
@@ -75,27 +77,58 @@ public class Main {
 		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
 		int loc = 0;
-
-		
 		System.out.println("Would you like the results to be human-legible? (y/n)");
 		String legible = System.console().readLine();
 
-		while(!legible.equals("y") && !legible.equals("n")){
-			System.out.println("Please enter 'y' or 'n'");
-			legible = System.console().readLine();
+		while (!legible.equals("y") && !legible.equals("n")) {
+				System.out.println("Please enter 'y' or 'n'");
+				legible = System.console().readLine();
 		}
 
-		if(legible.equals("y")){
-			System.out.println("Loc\tContents");
-			for(Code code : CodeGen.code){
-				if(!code.checkOperation().equals("HLT"))
-					System.out.println(loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation());
-				else 
-					System.out.println(loc++ + "\t" + code.toString() + "\tStop\t" + code.checkOperation());
+		try (FileOutputStream fos = new FileOutputStream("output.txt")) {
+				if (legible.equals("y")) {
+						System.out.println("Loc\tContents\t\tOP");
+						fos.write("Loc\tContents\t\tOP\n".getBytes()); // Write header to file
+
+						for (Code code : CodeGen.code) {
+								String output;
+								if (!code.checkOperation().equals("HLT")) {
+										output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
+								} else {
+										output = loc++ + "\t" + code.toString() + "\tStop\t" + code.checkOperation() + "\n";
+								}
+								System.out.print(output); // Write to console
+								fos.write(output.getBytes(StandardCharsets.UTF_8));
+						}
+						System.out.println("Results have been written to 'output.txt'");
+				} else {
+					try(FileOutputStream file2 = new FileOutputStream("output.bin")){
+						for (Code code : CodeGen.code) {
+								String output = code.toBinaryString() + "\n";
+								String binaryString = code.toBinaryString();
+
+								//remove spaces in binary string
+								binaryString = binaryString.replaceAll("\\s+", ""); 
+
+								//convert binary string into bytes
+								int length = binaryString.length();
+								for(int i = 0; i < length; i+= 8){
+									//extract 8 bits ( 1 byte ) per loop
+									String byteString = binaryString.substring(i, Math.min(i + 8, length));
+
+									//convert binary string to byte and write to .bin file
+									byte b = (byte) Integer.parseInt(byteString, 2);
+									file2.write(b);
+								}
+								System.out.print(output); // Write to console
+						}
 				}
-			} else 
-				for(Code code : CodeGen.code)
-					System.out.println(code.toBinaryString());
+				System.out.println("Results have been written to 'output.bin. Hex editor needed to view content");
+			}
+		} catch (IOException e) {
+				System.out.println("Error writing to file: " + e.getMessage());
+		}
+
 		}
     }
 }
