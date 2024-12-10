@@ -1,8 +1,7 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.nio.charset.StandardCharsets;import javax.swing.*;
+import javax.swing.*;
 
 public class Main {
   public static void main(String[] args){
