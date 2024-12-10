@@ -1,21 +1,44 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.ArrayList;
+import javax.swing.*;
 
 public class Main {
   public static void main(String[] args){
-    System.out.println("Enter the name of the file you'd like to tokenize: ");
-		String path = System.console().readLine();
 
-		if(path.equals(""))
-			path = "HelloWorld.txt"; // For testing purposes
-		
+	// Testing out Jframe
+	JFrame codeCompiler = new JFrame();
+
+	// File Chooser
+	JFileChooser fileChooser = new JFileChooser();
+	fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir") + "/src/"));
+	fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text files", "txt"));
+	int returnValue = fileChooser.showOpenDialog(codeCompiler);
+	String path = "";
+	if (returnValue == JFileChooser.APPROVE_OPTION)
+		path = fileChooser.getSelectedFile().getAbsolutePath();
+
+	// String to store the answer
+
+	// Button 
+	JButton yesBtn = new JButton("Yes");
+	yesBtn.setBounds(0, 150, 200, 40);
+	codeCompiler.add(yesBtn);
+
+	// Button 
+	JButton noBtn = new JButton("No");
+	noBtn.setBounds(200, 150, 200, 40);
+	codeCompiler.add(noBtn);
+
+	// Jframe properties
+	codeCompiler.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	codeCompiler.setSize(400, 400);
+	codeCompiler.setLayout(null);
+	codeCompiler.setVisible(true);
+
+	// End of JFrame testing
+
 		ArrayList<Token> tokens = new ArrayList<>();
 		File newFile = new File(path);
-
-		if (!newFile.exists())
-			newFile = new File("src/" + path); // Automatically appends src if not in the right location
 
 		// Read the file and tokenize it
 		try (RandomAccessFile file = new RandomAccessFile(newFile.getAbsolutePath(), "r")) {
