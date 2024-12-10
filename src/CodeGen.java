@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class CodeGen {
 
@@ -48,13 +47,6 @@ public class CodeGen {
     }
 
     public static void parseCode(){
-        // First pass, read all labels
-        for(Atom atom : atoms){
-            if(atom.checkOperator().equals("LBL"))
-                parseLBL(atom);
-        }
-
-        // Second pass, read all instructions
         while(hasMoreAtoms())
             parseAtom();
         code.add(new Code(Code.Operation.HLT.ordinal())); // Add the HALT instruction at the end
@@ -91,58 +83,62 @@ public class CodeGen {
 
     public static void parseADD(Atom current){ // ~ Brandon
         int data = parseReg(current.checkRight());
-        int reg = parseReg(current.checkLeft());
+        int reg = parseReg(current.checkResult());
         Code newInstruction = new Code(Code.Operation.ADD.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
     public static void parseSUB(Atom current) { // ~ Steven
         int data = parseReg(current.checkRight());
-        int reg = parseReg(current.checkLeft());
+        int reg = parseReg(current.checkResult());
         Code newInstruction = new Code(Code.Operation.SUB.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
     public static void parseMUL(Atom current){ // ~ Steven
         int data = parseReg(current.checkRight());
-        int reg = parseReg(current.checkLeft());
+        int reg = parseReg(current.checkResult());
         Code newInstruction = new Code(Code.Operation.MUL.ordinal(), reg, data);
         code.add(newInstruction);        
     }
 
     public static void parseDIV(Atom current){ // ~ Tucker
         int data = parseReg(current.checkRight());
-        int reg = parseReg(current.checkLeft());
+        int reg = parseReg(current.checkResult());
         Code newInstruction = new Code(Code.Operation.DIV.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
     public static void parseJMP(Atom current){
-        int data = findLocation(current.checkDestination()); // Destination
+        int data = parseReg(current.checkRight()); // Destination
         Code newInstruction = new Code(Code.Operation.JMP.ordinal(), data); // Make the instruction
         code.add(newInstruction);
     }
 
     public static void parseLBL(Atom current){
-        label_table.put(current.checkDestination(), atoms.indexOf(current)); // Add the label to the table
+        System.out.println("LBL detected");
+        // Do things here
+     
+
     }
 
     public static void parseTST(Atom current){
         int data = parseReg(current.checkRight());
-        int reg = parseReg(current.checkLeft());
-        Code newInstruction = new Code(Code.Operation.CMP.ordinal(), current.checkComparatorNum(), reg, data);
+        int cmp = parseReg(current.checkComparator());
+        int reg = parseReg(current.checkResult());
+        Code newInstruction = new Code(Code.Operation.CMP.ordinal(), cmp, reg, data);
+        code.add(new Code(Code.Operation.LOD.ordinal(), reg, parseReg(current.checkLeft())));
         code.add(newInstruction);
-        code.add(new Code(Code.Operation.JMP.ordinal(), findLocation(current.checkDestination())));
+
     }
 
     public static void parseMOV(Atom current){ // ~ Brandon
-        int data = parseReg(current.checkLeft());
+        int data = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
         Code newInstruction = new Code(Code.Operation.LOD.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
-    // Return the register number of the variable, or the literal
     public static int parseReg(String reg){
         // First, check if it is a variable or a literal
         try {
@@ -151,7 +147,7 @@ public class CodeGen {
 
         // Second, check if the variable name already has an associated register
         if(vars.contains(reg)){
-            return vars.indexOf(reg);
+            return vars.indexOf(reg) - 1;
         } else if (vars.size() != 16){
             vars.add(reg);
             variable_table.put(reg, programCounter);
@@ -161,13 +157,5 @@ public class CodeGen {
             // If not, check if there are any available registers
             throw new RuntimeException("No available registers");
         }
-    }
-
-    // Find the destination of a label in the label_table
-    public static int findLocation(String label){
-        if(label_table.containsKey(label))
-            return label_table.get(label);
-        else
-            throw new RuntimeException("Label not found: " + label);
     }
 }
