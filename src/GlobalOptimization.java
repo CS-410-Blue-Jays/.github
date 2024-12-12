@@ -9,6 +9,7 @@ class GlobalOptimization {
         for (Atom atom : optimizedAtoms)
             {
                 optimize(atom);
+                if (atom != null)
                 optimizedAtoms.add(atom);
             }
 
@@ -19,8 +20,10 @@ class GlobalOptimization {
     public static Atom optimize(Atom atom){
 
         // fill in constructor
-        Atom optimizedAtom = new Atom();
-        // fill in each helper method here
+    Atom optimizedAtom;
+    optimizedAtom = optimizeMultiplication(atom);
+
+        // fill in each helper method and condition to call here
 
 
         return optimizedAtom;
@@ -28,8 +31,24 @@ class GlobalOptimization {
     }
 
     public static Atom optimizeMultiplication(Atom atom)
-    {}
+    {
+           // case if 0 
+           // case if 1
+           
+           // check if bitwise shift applicable
+                // bitwise shift
+            
+            return atom;
 
+    }
 
-    
+     public static Atom optimizeAddSubtract(Atom atom)
+        {
+            // if an operand is 0, turn into store/load
+
+            return atom;
+            
+        }
+        
+
 }
