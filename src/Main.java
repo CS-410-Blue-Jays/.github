@@ -46,6 +46,10 @@ public class Main {
 	if(tokens.isEmpty())
 		System.err.println("No tokens found! Try pointing to a different file.");
 	else  {
+
+		//before printing, output to file
+		//String tokenFileName = outputTokens(tokens)
+		//System.out.println("Successfully outputted tokens to " + tokenFileName);
 		for(Token tok : tokens)
 			System.out.println(tok.toString());
 	
@@ -55,19 +59,9 @@ public class Main {
 		for(Atom atom : atoms)
 			System.out.println(atom.toString());
 
-		try (FileOutputStream fos = new FileOutputStream(fileName + "-output.atoms")) {
-
-				for (Atom atom : atoms) {
-					String output = "";
-					output += atom.toString() + "\n";
-					fos.write(output.getBytes(StandardCharsets.UTF_8));
-				}
-				System.out.println("\nResults have been written to '" + fileName + "-output.txt'");
-		} catch (IOException e) {
-				System.out.println("\nError writing to file: " + e.getMessage());
-		}
-
-
+		//write atoms to file
+		String atomOutputFile = new FileOutput().atomOutput(atoms, fileName);
+		
 		// Generate Mini code
 		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
