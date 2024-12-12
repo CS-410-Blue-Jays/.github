@@ -67,10 +67,30 @@ public class Main {
 				System.out.println("\nError writing to file: " + e.getMessage());
 		}
 
-
 		// Generate Mini code
 		System.out.println("\nGenerating Mini Architecture code...");
+
+		atoms = new ArrayList<>(); // Flush the atoms
+
+		// Parse the atoms from the file
+		try (FileInputStream fis = new FileInputStream(fileName + "-output.atoms")) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+				String line;
+				while ((line = reader.readLine()) != null) {
+						String[] parts = line.split(" ");
+						if (parts.length == 3) {
+							Atom atom = Atom.parseString(line);
+							if(atom != null)
+								atoms.add(atom);
+						}
+				}
+		} catch (IOException e) {
+				System.out.println("Error reading file: " + e.getMessage());
+		}
+
+		// Read the file and atomize it
 		CodeGen.generate(atoms);
+
 		int loc = 0;
 		System.out.println("\nWould you like the results to be human-legible? (y/n)");
 		String legible = System.console().readLine().toLowerCase();

@@ -20,6 +20,14 @@ public class Atom {
       case ADD, SUB, MUL, DIV, MOV -> "(" + operation + ", " + left + ", " + right + ", " + result + ")";
     };
   }
+
+  public static Atom parseString(String line) {
+    String[] parts = line.split(" ");
+    if (parts.length == 3) {
+      return new Atom(Operation.valueOf(parts[0]), parts[1], parts[2]);
+    }
+    return null;
+  }
   
   // Constructor for add/sub/mul/div operations
   // Example (SUB, "A", "B", "C") -> C = A - B
