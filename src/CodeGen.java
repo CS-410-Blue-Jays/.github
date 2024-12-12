@@ -29,18 +29,24 @@ public class CodeGen {
         atoms = insertedAtoms;
         parseCode();
 
-        System.out.println("\nLABEL TABLE\n");
-        System.out.println("LBL\tLocation");
-        for(String label : label_table.keySet())
-        {
-            System.out.println(label + "\t" + label_table.get(label));
+        // Print out the completed Label Table (if not empty)
+        if(label_table.isEmpty())
+            System.out.println("\nNo labels found in the code");
+        else {
+            System.out.println("\nLABEL TABLE");
+            System.out.println("LBL\tLocation");
+            for(String label : label_table.keySet())
+                System.out.println(label + "\t" + label_table.get(label));
         }
         
-        System.out.println("\nVARIABLE TABLE\n");
-        System.out.println("VAR\tLocation");
-        for(String var : variable_table.keySet())
-        {
-            System.out.println(var + "\t" + variable_table.get(var));
+        // Print out the completed Variable Table (if not empty)
+        if(variable_table.isEmpty())
+            System.out.println("\nNo variables found in the code");
+        else {
+            System.out.println("\nVARIABLE TABLE");
+            System.out.println("VAR\tLocation");
+            for(String var : variable_table.keySet())
+                System.out.println(var + "\t" + variable_table.get(var));
         }
 
         return code;
@@ -116,10 +122,7 @@ public class CodeGen {
     }
 
     public static void parseLBL(Atom current){
-        System.out.println("LBL detected");
-        // Do things here
-     
-
+        label_table.put(current.checkDestination(), atoms.indexOf(current)); // Add the label to the table
     }
 
     public static void parseTST(Atom current){
@@ -151,7 +154,6 @@ public class CodeGen {
         } else if (vars.size() != 16){
             vars.add(reg);
             variable_table.put(reg, programCounter);
-            System.out.println("Adding variable " +reg+ " at location " +programCounter);
             return vars.indexOf(reg);
         } else {
             // If not, check if there are any available registers
