@@ -55,22 +55,34 @@ public class Main {
 		for(Atom atom : atoms)
 			System.out.println(atom.toString());
 
+		try (FileOutputStream fos = new FileOutputStream(fileName + "-output.atoms")) {
+
+				for (Atom atom : atoms) {
+					String output = "";
+					output += atom.toString() + "\n";
+					fos.write(output.getBytes(StandardCharsets.UTF_8));
+				}
+				System.out.println("\nResults have been written to '" + fileName + "-output.txt'");
+		} catch (IOException e) {
+				System.out.println("\nError writing to file: " + e.getMessage());
+		}
+
+
 		// Generate Mini code
 		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
 		int loc = 0;
-		System.out.print("\nWould you like the results to be human-legible? (y/n) ");
-		String legible = System.console().readLine();
+		System.out.println("\nWould you like the results to be human-legible? (y/n)");
+		String legible = System.console().readLine().toLowerCase();
 		System.out.println(""); // Add a newline for readability
 
 		while (!legible.equals("y") && !legible.equals("n")) {
 				System.out.println("Please enter 'y' or 'n'");
-				legible = System.console().readLine();
+				legible = System.console().readLine().toLowerCase();
 		}
 
 		try (FileOutputStream fos = new FileOutputStream(fileName + "-output.txt")) {
 				if (legible.equals("y")) {
-						System.out.println("Loc\tContents\t\tOP");
 						fos.write("Loc\tContents\t\tOP\n".getBytes()); // Write header to file
 
 						for (Code code : CodeGen.code) {
@@ -78,7 +90,7 @@ public class Main {
 								if (!code.checkOperation().equals("HLT")) {
 										output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
 								} else {
-										output = loc++ + "\t" + code.toString() + "\tStop\t" + code.checkOperation() + "\n";
+										output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
 								}
 								fos.write(output.getBytes(StandardCharsets.UTF_8));
 						}
