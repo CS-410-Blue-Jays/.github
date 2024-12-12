@@ -1,0 +1,5 @@
+(ADD, a, 3, a)
+(SUB, n, 10, n)
+(DIV, n, 3, n)
+(ADD, n, n, l)
+(SUB, 4, n, y)
