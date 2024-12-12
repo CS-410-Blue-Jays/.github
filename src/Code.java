@@ -103,4 +103,7 @@ public class Code {
     public final String addPadding(int num){
         return String.format("%05d", num);
     }
+    public final int checkData() {
+        return (int) (this.code % 100000);
+    }
 }
