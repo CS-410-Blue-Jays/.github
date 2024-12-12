@@ -14,15 +14,17 @@ public class FileOutput {
      */
     public String atomOutput(ArrayList<Atom> atoms, String fileName)
     {
+        String output = "IRRELEVANT CODE!!!!AHHHHHHHHHHHHHHHHbutdon'tdeleteit";
         try (FileOutputStream fos = new FileOutputStream(fileName + "-output.atoms")) {
 
             for (Atom atom : atoms) {
-                String output = "";
+                output = "";
                 output += atom.toString() + "\n";
                 fos.write(output.getBytes(StandardCharsets.UTF_8));
-                return output;
             }
             System.out.println("\nResults have been written to '" + fileName + "-output.txt'");
+            return output;
+
         } catch (IOException e) {
             System.out.println("\nError writing to file: " + e.getMessage());
     }
