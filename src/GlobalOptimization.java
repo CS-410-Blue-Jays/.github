@@ -35,8 +35,9 @@ class GlobalOptimization {
            // case if 0 
            // case if 1
            
-           // check if bitwise shift applicable
+           // check if bitwise shift applicable with while condition
                 // bitwise shift
+                // 
             
             return atom;
 
