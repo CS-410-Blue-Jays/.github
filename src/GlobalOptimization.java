@@ -46,6 +46,20 @@ class GlobalOptimization {
         {
             // if an operand is 0, turn into store/load
 
+            if(atom.checkRight().equals("0")){
+                //Store/load the value in the left register
+                //How do we express this in atoms?
+            }
+
+            else if(atom.checkLeft().equals("0")){
+                if(atom.checkOperator().equals("ADD")){
+                    //Store/load the value in the right register
+                }
+                else if(atom.checkOperator().equals("SUB")){
+                    //Store/load the negation of the value in the right register
+                }
+            }
+
             return atom;
             
         }
