@@ -32,8 +32,17 @@ class GlobalOptimization {
 
     public static Atom optimizeMultiplication(Atom atom)
     {
-           // case if 0 
+           // case if 0
+           if(atom.checkLeft().equals("0") || atom.checkRight().equals("0")){
+            //store/load 0
+           }
            // case if 1
+           else if(atom.checkLeft().equals("1")){
+            //store/load the right value
+           }
+           else if(atom.checkRight().equals("1")){
+            //store/load the left value
+           }
            
            // check if bitwise shift applicable
                 // bitwise shift
