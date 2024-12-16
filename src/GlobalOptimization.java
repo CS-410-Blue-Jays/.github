@@ -44,15 +44,14 @@ class GlobalOptimization {
             //store/load the left value
            }
            
-           // check if bitwise shift applicable with while condition
+           // check if bitwise shift applicable
                 // bitwise shift
-                // 
             
             return atom;
 
     }
 
-     public static Atom optimizeAddSubtract(Atom atom)
+    public static Atom optimizeAddSubtract(Atom atom)
         {
             // if an operand is 0, turn into store/load
 
