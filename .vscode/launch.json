@@ -5,6 +5,10 @@
       "name": "MiniVM",
       "request": "launch",
       "mainClass": "MiniVM",
+    },
+      "name": "FileOutput",
+      "request": "launch",
+      "mainClass": "FileOutput",
       "projectName": "Scanner"
     },
     {
