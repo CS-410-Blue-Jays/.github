@@ -102,11 +102,12 @@ public class Main {
 				else
 					output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
 				fos.write(output.getBytes(StandardCharsets.UTF_8));
-				System.out.println("Legible results have been written to '" + fileName + "-output.txt'");
 			}
 		} catch (IOException e) {
 			System.out.println("Error writing to file: " + e.getMessage());
 		}
+		
+		System.out.println("\nLegible results have been written to '" + fileName + "-output.txt'");
 
 		try(FileOutputStream file2 = new FileOutputStream(fileName + "-output.miniexe")){
 						for (Code code : CodeGen.code) {
@@ -127,7 +128,7 @@ public class Main {
 							
 						}
 					}
-					System.out.println("Results have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
+					System.out.println("\nResults have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
 			} catch (IOException e) {
 					System.out.println("Error writing to file: " + e.getMessage());
 			}
