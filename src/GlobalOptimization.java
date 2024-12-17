@@ -8,9 +8,19 @@ class GlobalOptimization {
 
         for (Atom atom : atoms)
             {
-                optimize(atom);
-                if (atom != null)
-                optimizedAtoms.add(atom);
+                Atom newAtom = optimize(atom);
+                if (atom != null){
+                    optimizedAtoms.add(newAtom);
+                    System.out.println("Added optimized atom of type " +newAtom.checkOperator());
+                }
+
+                //debugging statement
+                //if it doesn't add an oprtimized atom, print that
+                else{
+                    System.out.println("Atom not optimized");
+                    //add the original atom, since no otimizations could be made
+                    optimizedAtoms.add(atom);
+                }
             }
 
             return optimizedAtoms;
@@ -39,15 +49,24 @@ class GlobalOptimization {
 
            // case if 0
            if(left == 0 || right == 0){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Multiply by 0");
+
             //store/load 0
             return new Atom(Atom.Operation.MOV, "0", atom.checkResult());
            }
            // case if 1
            else if(left == 1){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Multiply by 1");
+
             //store/load the right value
             return new Atom(Atom.Operation.MOV, atom.checkRight(), atom.checkResult());
            }
            else if(right == 1){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Multiply by 1");
+
             //store/load the left value
             return new Atom(Atom.Operation.MOV, atom.checkLeft(), atom.checkResult());
            }
@@ -55,11 +74,18 @@ class GlobalOptimization {
            // check if bitwise shift applicable
            // bitwise shift
            if(isPowerOfTwo(left)){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Bitwise shift");
+
             int numShifts = logBase2(left);
             String newLeft = Integer.toString(left << numShifts);
             return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
            }
+
            else if(isPowerOfTwo(right)){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Bitwise shift");
+
             int numShifts = logBase2(right);
             String newRight = Integer.toString(right << numShifts);
             return new Atom(Atom.Operation.MOV, newRight, atom.checkResult());
@@ -74,15 +100,29 @@ class GlobalOptimization {
         int left = Integer.parseInt(atom.checkLeft());
         int right = Integer.parseInt(atom.checkRight());
 
+        //if dividing by 0, do not optimize
+        if(right == 0){
+            return null;
+        }
+
         if(left == 0){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Divide 0");
+
             return new Atom(Atom.Operation.MOV, "0", atom.checkResult());
         }
 
         if(right == 1){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Divide by 1");
+
             return new Atom(Atom.Operation.MOV, atom.checkLeft(), atom.checkResult());
         }
 
         if(isPowerOfTwo(right)){
+            //debugging statement
+            System.out.println("Optimization made to " +atom.checkOperator()+ "; Bitwise shift");
+
             int numShifts = logBase2(right);
             String newLeft = Integer.toString(left >> numShifts);
             return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
@@ -98,16 +138,25 @@ class GlobalOptimization {
 
             if(atom.checkRight().equals("0")){
                 //Store/load the value in the left register
-                //How do we express this in atoms?
+
+                //debugging statement
+                System.out.println("Optimization made to " +atom.checkOperator()+ "; Add/Subtract by 0");
+
                 return new Atom(Atom.Operation.MOV, atom.checkLeft(), atom.checkResult());
             }
 
             else if(atom.checkLeft().equals("0")){
                 if(atom.checkOperator().equals("ADD")){
+                    //debugging statement
+                    System.out.println("Optimization made to " +atom.checkOperator()+ "; Add to 0");
+
                     //Store/load the value in the right register
                     return new Atom(Atom.Operation.MOV, atom.checkRight(), atom.checkResult());
                 }
                 else if(atom.checkOperator().equals("SUB")){
+                    //debugging statement
+                    System.out.println("Optimization made to " +atom.checkOperator()+ "; Subtract from 0");
+
                     //Store/load the negation of the value in the right register
                     return new Atom(Atom.Operation.NEG, atom.checkRight(), atom.checkResult());
                 }
