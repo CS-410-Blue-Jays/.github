@@ -2,6 +2,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "MiniVM",
+      "request": "launch",
+      "mainClass": "MiniVM",
+      "projectName": "Scanner"
+    },
+    {
+      "type": "java",
       "name": "CodeGen",
       "request": "launch",
       "mainClass": "CodeGen",
