@@ -19,12 +19,12 @@ public class Code {
     // Need to return a string representation of the Code object
     @Override
     public String toString() {
-        return Long.toString(code);
+        return addPadding((int) code);
     }
 
     public String toBinaryString(){
 
-        String num = Long.toString(code);
+        String num = addPadding((int) code);
         String out = "";
 
         for(int i = 0; i < num.length(); i++){
@@ -106,6 +106,6 @@ public class Code {
 
     // Add left-padding to the data until it has 5 places
     public final String addPadding(int num){
-        return String.format("%05d", num);
+        return String.format("%08d", num);
     }
 }

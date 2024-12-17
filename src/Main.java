@@ -76,8 +76,8 @@ public class Main {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 			String line;
 			while ((line = reader.readLine()) != null) {
-					Atom atom = Atom.parseString(line);
-					atoms.add(atom);
+				Atom atom = Atom.parseString(line);
+				atoms.add(atom);
 			}
 	} catch (IOException e) {
 		System.out.println("Error reading file: " + e.getMessage());
@@ -99,7 +99,7 @@ public class Main {
 				output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
 			else
 				output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
-			fos.write(output.getBytes(StandardCharsets.UTF_8));
+			fos.write(output.getBytes());
 		}
 	} catch (IOException e) {
 		System.out.println("Error writing to file: " + e.getMessage());
@@ -108,34 +108,34 @@ public class Main {
 	System.out.println("\nLegible results have been written to '" + fileName + "-output.txt'");
 
 	try(FileOutputStream file2 = new FileOutputStream(fileName + "-output.bin")) {
-				for (Code code : CodeGen.code) {
-					String binaryString = code.toBinaryString();
 
-					//remove spaces in binary string
-					binaryString = binaryString.replaceAll("\\s+", ""); 
+			for (Code code : CodeGen.code) {
+				String binaryString = code.toBinaryString();
 
-					//convert binary string into bytes
-					int length = binaryString.length();
-					for(int i = 0; i < length; i+= 8){
-						//extract 8 bits ( 1 byte ) per loop
-						String byteString = binaryString.substring(i, Math.min(i + 8, length));
+				//remove spaces in binary string
+				binaryString = binaryString.replaceAll("\\s+", ""); 
 
-						//convert binary string to byte and write to .bin file
-						byte b = (byte) Integer.parseInt(byteString, 2);
-						file2.write(b);
-					
+				//convert binary string into bytes
+				int length = binaryString.length();
+				for(int i = 0; i < length; i+= 8){
+					//extract 8 bits ( 1 byte ) per loop
+					String byteString = binaryString.substring(i, Math.min(i + 8, length));
+
+					//convert binary string to byte and write to .bin file
+					byte b = (byte) Integer.parseInt(byteString, 2);
+					file2.write(b);
 				}
 			}
-			System.out.println("\nResults have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
-		} catch (IOException e) {
-				System.out.println("Error writing to file: " + e.getMessage());
-		}
+		System.out.println("\nResults have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
+	} catch (IOException e) {
+		System.out.println("Error writing to file: " + e.getMessage());
+	}
 	
 	// Attempt to execute the MiniVM
 	System.out.println("\nExecuting MiniVM...");
 	try {
 		MiniVM vm = new MiniVM(fileName + "-output.bin");
-		vm.execute(true, true);
+		vm.execute(true, false);
 	} catch (FileNotFoundException e) {
 		System.out.println("File not found: " + e.getMessage());
 	} catch (IOException e) {
@@ -144,5 +144,6 @@ public class Main {
 		System.out.println("Error executing MiniVM: " + e.getMessage());
 	}
 
+	System.exit(1);
     } // End of main
 } // End of class
