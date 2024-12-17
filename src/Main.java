@@ -65,7 +65,6 @@ public class Main {
 	} catch (IOException e) {
 			System.out.println("\nError writing to file: " + e.getMessage());
 	}
-	
 
 	// Read the atom file
 	System.out.println("\nReading resulting atoms from file...");
@@ -109,29 +108,29 @@ public class Main {
 	System.out.println("\nLegible results have been written to '" + fileName + "-output.txt'");
 
 	try(FileOutputStream file2 = new FileOutputStream(fileName + "-output.bin")) {
-					for (Code code : CodeGen.code) {
-						String binaryString = code.toBinaryString();
+				for (Code code : CodeGen.code) {
+					String binaryString = code.toBinaryString();
 
-						//remove spaces in binary string
-						binaryString = binaryString.replaceAll("\\s+", ""); 
+					//remove spaces in binary string
+					binaryString = binaryString.replaceAll("\\s+", ""); 
 
-						//convert binary string into bytes
-						int length = binaryString.length();
-						for(int i = 0; i < length; i+= 8){
-							//extract 8 bits ( 1 byte ) per loop
-							String byteString = binaryString.substring(i, Math.min(i + 8, length));
+					//convert binary string into bytes
+					int length = binaryString.length();
+					for(int i = 0; i < length; i+= 8){
+						//extract 8 bits ( 1 byte ) per loop
+						String byteString = binaryString.substring(i, Math.min(i + 8, length));
 
-							//convert binary string to byte and write to .bin file
-							byte b = (byte) Integer.parseInt(byteString, 2);
-							file2.write(b);
-						
-					}
+						//convert binary string to byte and write to .bin file
+						byte b = (byte) Integer.parseInt(byteString, 2);
+						file2.write(b);
+					
 				}
-				System.out.println("\nResults have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
+			}
+			System.out.println("\nResults have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
 		} catch (IOException e) {
 				System.out.println("Error writing to file: " + e.getMessage());
 		}
-		
+	
 	// Attempt to execute the MiniVM
 	System.out.println("\nExecuting MiniVM...");
 	try {
