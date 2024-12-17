@@ -22,6 +22,8 @@ class GlobalOptimization {
         switch(atom.checkOperator()){
             case "MUL":
                 return optimizeMultiplication(atom);
+            case "DIV":
+                return optimizeDivision(atom);
             case "ADD":
             case "SUB":
                 return optimizeAddSubtract(atom);
@@ -33,26 +35,61 @@ class GlobalOptimization {
     public static Atom optimizeMultiplication(Atom atom)
     {
         int left = Integer.parseInt(atom.checkLeft());
+        int right = Integer.parseInt(atom.checkRight());
+
            // case if 0
-           if(atom.checkLeft().equals("0") || atom.checkRight().equals("0")){
+           if(left == 0 || right == 0){
             //store/load 0
             return new Atom(Atom.Operation.MOV, "0", atom.checkResult());
            }
            // case if 1
-           else if(atom.checkLeft().equals("1")){
+           else if(left == 1){
             //store/load the right value
             return new Atom(Atom.Operation.MOV, atom.checkRight(), atom.checkResult());
            }
-           else if(atom.checkRight().equals("1")){
+           else if(right == 1){
             //store/load the left value
             return new Atom(Atom.Operation.MOV, atom.checkLeft(), atom.checkResult());
            }
            
            // check if bitwise shift applicable
            // bitwise shift
-            
-            return atom;
+           if(isPowerOfTwo(left)){
+            int numShifts = logBase2(left);
+            String newLeft = Integer.toString(left << numShifts);
+            return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
+           }
+           else if(isPowerOfTwo(right)){
+            int numShifts = logBase2(right);
+            String newRight = Integer.toString(right << numShifts);
+            return new Atom(Atom.Operation.MOV, newRight, atom.checkResult());
+           }
 
+           //return null if no optimizations can be performed
+           return null;
+
+    }
+
+    public static Atom optimizeDivision(Atom atom){
+        int left = Integer.parseInt(atom.checkLeft());
+        int right = Integer.parseInt(atom.checkRight());
+
+        if(left == 0){
+            return new Atom(Atom.Operation.MOV, "0", atom.checkResult());
+        }
+
+        if(right == 1){
+            return new Atom(Atom.Operation.MOV, atom.checkLeft(), atom.checkResult());
+        }
+
+        if(isPowerOfTwo(right)){
+            int numShifts = logBase2(right);
+            String newLeft = Integer.toString(left >> numShifts);
+            return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
+        }
+
+        //return null if no optimizations are performed
+        return null;
     }
 
     public static Atom optimizeAddSubtract(Atom atom)
@@ -76,16 +113,21 @@ class GlobalOptimization {
                 }
             }
 
-            return atom;
+            //return null if no optimizations can be performed
+            return null;
             
         }
     
     public static Boolean isPowerOfTwo(int n){
-        if(n <= 0){
+        if (n <= 0) {
             return false;
         }
 
-        return ((n & (n-1)) == 0 );
+        return (n & (n - 1)) == 0;
+    }
+
+    public static int logBase2(int n){
+        return (int)(Math.log(n)/Math.log(2));
     }
         
 
