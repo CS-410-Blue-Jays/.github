@@ -6,7 +6,7 @@ class GlobalOptimization {
         
         ArrayList<Atom> optimizedAtoms = new ArrayList<Atom>();
 
-        for (Atom atom : optimizedAtoms)
+        for (Atom atom : atoms)
             {
                 optimize(atom);
                 if (atom != null)
@@ -19,19 +19,20 @@ class GlobalOptimization {
 
     public static Atom optimize(Atom atom){
 
-        // fill in constructor
-    Atom optimizedAtom;
-    optimizedAtom = optimizeMultiplication(atom);
-
-        // fill in each helper method and condition to call here
-
-
-        return optimizedAtom;
-
+        switch(atom.checkOperator()){
+            case "MUL":
+                return optimizeMultiplication(atom);
+            case "ADD":
+            case "SUB":
+                return optimizeAddSubtract(atom);
+            default:
+                return null;
+        }
     }
 
     public static Atom optimizeMultiplication(Atom atom)
     {
+        int left = parseInt(atom.checkLeft());
            // case if 0
            if(atom.checkLeft().equals("0") || atom.checkRight().equals("0")){
             //store/load 0
@@ -48,7 +49,7 @@ class GlobalOptimization {
            }
            
            // check if bitwise shift applicable
-                // bitwise shift
+           // bitwise shift
             
             return atom;
 
@@ -78,6 +79,14 @@ class GlobalOptimization {
             return atom;
             
         }
+    
+    public static Boolean isPowerOfTwo(int n){
+        if(n <= 0){
+            return false;
+        }
+
+        return ((n & (n-1)) == 0 );
+    }
         
 
 }
