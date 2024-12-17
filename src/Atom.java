@@ -22,11 +22,14 @@ public class Atom {
   }
 
   public static Atom parseString(String line) {
-    String[] parts = line.split(" ");
-    if (parts.length == 3) {
-      return new Atom(Operation.valueOf(parts[0]), parts[1], parts[2]);
-    }
-    return null;
+    String[] parts = line.split(",");
+    return switch (parts.length) {
+      case 2 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1, parts[1].length() - 1));
+      case 3 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1, parts[2].length() - 1));
+      case 4 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1), parts[3].substring(1, parts[3].length() - 1));
+      case 5 -> new Atom(Operation.valueOf(parts[0]), parts[1].substring(1), parts[2].substring(1), parts[3].substring(1), Integer.parseInt(parts[4].substring(1, parts[4].length() - 1)));
+      default -> null;
+    };
   }
   
   // Constructor for add/sub/mul/div operations

@@ -67,8 +67,8 @@ public class Main {
 				System.out.println("\nError writing to file: " + e.getMessage());
 		}
 
-		// Generate Mini code
-		System.out.println("\nGenerating Mini Architecture code...");
+		// Read the atom file
+		System.out.println("\nReading resulting atoms from file...");
 
 		atoms = new ArrayList<>(); // Flush the atoms
 
@@ -77,46 +77,39 @@ public class Main {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 				String line;
 				while ((line = reader.readLine()) != null) {
-						String[] parts = line.split(" ");
-						if (parts.length == 3) {
-							Atom atom = Atom.parseString(line);
-							if(atom != null)
-								atoms.add(atom);
-						}
+						Atom atom = Atom.parseString(line);
+						System.out.println(atom.toString());
+						if(atom != null)
+							atoms.add(atom);
 				}
 		} catch (IOException e) {
-				System.out.println("Error reading file: " + e.getMessage());
+			System.out.println("Error reading file: " + e.getMessage());
 		}
 
 		// Read the file and atomize it
 		CodeGen.generate(atoms);
 
 		int loc = 0;
-		System.out.println("\nWould you like the results to be human-legible? (y/n)");
-		String legible = System.console().readLine().toLowerCase();
-		System.out.println(""); // Add a newline for readability
 
-		while (!legible.equals("y") && !legible.equals("n")) {
-				System.out.println("Please enter 'y' or 'n'");
-				legible = System.console().readLine().toLowerCase();
-		}
+		System.out.println("\nGenerating Mini Architecture code...");
 
 		try (FileOutputStream fos = new FileOutputStream(fileName + "-output.txt")) {
-				if (legible.equals("y")) {
-						fos.write("Loc\tContents\t\tOP\n".getBytes()); // Write header to file
+			fos.write("Loc\tContents\t\tOP\n".getBytes()); // Write header to file
 
-						for (Code code : CodeGen.code) {
-								String output;
-								if (!code.checkOperation().equals("HLT")) {
-										output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
-								} else {
-										output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
-								}
-								fos.write(output.getBytes(StandardCharsets.UTF_8));
-						}
-						System.out.println("Results have been written to '" + fileName + "-output.txt'");
-				} else {
-					try(FileOutputStream file2 = new FileOutputStream(fileName + "-output.miniexe")){
+			for (Code code : CodeGen.code) {
+				String output;
+				if (!code.checkOperation().equals("HLT"))
+					output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
+				else
+					output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
+				fos.write(output.getBytes(StandardCharsets.UTF_8));
+				System.out.println("Legible results have been written to '" + fileName + "-output.txt'");
+			}
+		} catch (IOException e) {
+			System.out.println("Error writing to file: " + e.getMessage());
+		}
+
+		try(FileOutputStream file2 = new FileOutputStream(fileName + "-output.miniexe")){
 						for (Code code : CodeGen.code) {
 							String binaryString = code.toBinaryString();
 
@@ -132,11 +125,10 @@ public class Main {
 								//convert binary string to byte and write to .bin file
 								byte b = (byte) Integer.parseInt(byteString, 2);
 								file2.write(b);
-							}
+							
 						}
 					}
 					System.out.println("Results have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
-				}
 			} catch (IOException e) {
 					System.out.println("Error writing to file: " + e.getMessage());
 			}
