@@ -27,6 +27,10 @@ public class CodeGen {
 
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
+
+        // Add the starting address (00000001)
+        code.add(new Code(Code.Operation.CLR.ordinal(), 0, 1));
+
         parseCode();
 
         // Print out the completed Label Table (if not empty)
