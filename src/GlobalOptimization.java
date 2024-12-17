@@ -32,7 +32,7 @@ class GlobalOptimization {
 
     public static Atom optimizeMultiplication(Atom atom)
     {
-        int left = parseInt(atom.checkLeft());
+        int left = Integer.parseInt(atom.checkLeft());
            // case if 0
            if(atom.checkLeft().equals("0") || atom.checkRight().equals("0")){
             //store/load 0
