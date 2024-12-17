@@ -62,6 +62,7 @@ public class Main {
 		//write atoms to file
 		String atomOutputFile = new FileOutput().atomOutput(atoms, fileName);
 		
+		//NEED TO INPUT ATOMOUTPUTFILE INTO A
 		// Generate Mini code
 		System.out.println("\nGenerating Mini Architecture code...");
 		CodeGen.generate(atoms);
