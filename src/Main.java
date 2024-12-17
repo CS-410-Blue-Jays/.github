@@ -52,8 +52,6 @@ public class Main {
 		// Parse the tokens
 		System.out.println("\nParsing tokens...");
 		ArrayList<Atom> atoms = Parser.parse(tokens);
-		for(Atom atom : atoms)
-			System.out.println(atom.toString());
 
 		try (FileOutputStream fos = new FileOutputStream(fileName + "-output.atoms")) {
 
@@ -78,7 +76,6 @@ public class Main {
 				String line;
 				while ((line = reader.readLine()) != null) {
 						Atom atom = Atom.parseString(line);
-						System.out.println(atom.toString());
 						atoms.add(atom);
 				}
 		} catch (IOException e) {
