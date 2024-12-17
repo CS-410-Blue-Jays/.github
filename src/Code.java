@@ -29,7 +29,6 @@ public class Code {
 
         for(int i = 0; i < num.length(); i++){
             out += switch (num.charAt(i)) {
-                case '0' -> "0000 ";
                 case '1' -> "0001 ";
                 case '2' -> "0010 ";
                 case '3' -> "0011 ";
@@ -39,7 +38,13 @@ public class Code {
                 case '7' -> "0111 ";
                 case '8' -> "1000 ";
                 case '9' -> "1001 ";
-                default -> "";
+                case 'A' -> "1010 ";
+                case 'B' -> "1011 ";
+                case 'C' -> "1100 ";
+                case 'D' -> "1101 ";
+                case 'E' -> "1110 ";
+                case 'F' -> "1111 ";
+                default -> "0000";
             };
         }
 
