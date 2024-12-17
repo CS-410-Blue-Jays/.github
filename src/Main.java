@@ -79,8 +79,7 @@ public class Main {
 				while ((line = reader.readLine()) != null) {
 						Atom atom = Atom.parseString(line);
 						System.out.println(atom.toString());
-						if(atom != null)
-							atoms.add(atom);
+						atoms.add(atom);
 				}
 		} catch (IOException e) {
 			System.out.println("Error reading file: " + e.getMessage());
