@@ -53,71 +53,28 @@ public class Main {
 	System.out.println("\nParsing tokens...");
 	ArrayList<Atom> atoms = Parser.parse(tokens);
 
-	//Output atoms to file
-	FileInputOutput fio = new FileInputOutput(); //condenses code, this works the same
-	String printAtomsToConsole = fio.atomOutput(atoms, fileName + "-output.atoms");
-	System.out.println(printAtomsToConsole);
+	FileInputOutput fio = new FileInputOutput(); //init class, saves space in main.java
 
-	// Read the atom file
-	System.out.println("\nReading resulting atoms from file...");
+	String atom_output_fileName = fio.atomOutput(atoms, fileName);	// atom output to file
+	
+	System.out.println("\nReading resulting atoms from file...");	// Read the atom file
 
 	atoms = new ArrayList<>(); // Flush the atoms
 	
-	//INPUT from file
-	atoms = fio.atomInput(fileName + "-output.atoms");
+	atoms = fio.atomInput(atom_output_fileName);	//file input to atoms
 
-	// Read the file and atomize it
-	CodeGen.generate(atoms);
-
-	int loc = 0;
+	ArrayList<Code> codeList = CodeGen.generate(atoms);	// Read the file and atomize it
 
 	System.out.println("\nGenerating Mini Architecture code...");
 
-	try (FileOutputStream fos = new FileOutputStream(fileName + "-output.txt")) {
-		fos.write("Loc\tContents\t\tOP\n".getBytes()); // Write header to file
-
-		for (Code code : CodeGen.code) {
-			String output;
-			if (!code.checkOperation().equals("HLT"))
-				output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
-			else
-				output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
-			fos.write(output.getBytes());
-		}
-	} catch (IOException e) {
-		System.out.println("Error writing to file: " + e.getMessage());
-	}
+	String output_txt_fileName = fio.codeGenTxtOutput(fileName, codeList);	//codeGen output to .txt
 	
-	System.out.println("\nLegible results have been written to '" + fileName + "-output.txt'");
-
-	try(FileOutputStream file2 = new FileOutputStream(fileName + "-output.bin")) {
-
-			for (Code code : CodeGen.code) {
-				String binaryString = code.toBinaryString();
-
-				//remove spaces in binary string
-				binaryString = binaryString.replaceAll("\\s+", ""); 
-
-				//convert binary string into bytes
-				int length = binaryString.length();
-				for(int i = 0; i < length; i+= 8){
-					//extract 8 bits ( 1 byte ) per loop
-					String byteString = binaryString.substring(i, Math.min(i + 8, length));
-
-					//convert binary string to byte and write to .bin file
-					byte b = (byte) Integer.parseInt(byteString, 2);
-					file2.write(b);
-				}
-			}
-		System.out.println("\nResults have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
-	} catch (IOException e) {
-		System.out.println("Error writing to file: " + e.getMessage());
-	}
+	String output_bin_fileName = fio.codeGenBinOutput(fileName, codeList);	//codeGen output to .bin
 	
 	// Attempt to execute the MiniVM
 	System.out.println("\nExecuting MiniVM...");
 	try {
-		MiniVM vm = new MiniVM(fileName + "-output.bin");
+		MiniVM vm = new MiniVM(output_bin_fileName);
 		vm.execute(true, false);
 	} catch (FileNotFoundException e) {
 		System.out.println("File not found: " + e.getMessage());
