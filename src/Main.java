@@ -1,5 +1,4 @@
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import javax.swing.*;
 
@@ -54,34 +53,18 @@ public class Main {
 	System.out.println("\nParsing tokens...");
 	ArrayList<Atom> atoms = Parser.parse(tokens);
 
-	try (FileOutputStream fos = new FileOutputStream(fileName + "-output.atoms")) {
-
-			for (Atom atom : atoms) {
-				String output = "";
-				output += atom.toString() + "\n";
-				fos.write(output.getBytes(StandardCharsets.UTF_8));
-			}
-			System.out.println("\nResults have been written to '" + fileName + "-output.txt'");
-	} catch (IOException e) {
-			System.out.println("\nError writing to file: " + e.getMessage());
-	}
+	//Output atoms to file
+	FileInputOutput fio = new FileInputOutput(); //condenses code, this works the same
+	String printAtomsToConsole = fio.atomOutput(atoms, fileName + "-output.atoms");
+	System.out.println(printAtomsToConsole);
 
 	// Read the atom file
 	System.out.println("\nReading resulting atoms from file...");
 
 	atoms = new ArrayList<>(); // Flush the atoms
-
-	// Parse the atoms from the file
-	try (FileInputStream fis = new FileInputStream(fileName + "-output.atoms")) {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				Atom atom = Atom.parseString(line);
-				atoms.add(atom);
-			}
-	} catch (IOException e) {
-		System.out.println("Error reading file: " + e.getMessage());
-	}
+	
+	//INPUT from file
+	atoms = fio.atomInput(fileName + "-output.atoms");
 
 	// Read the file and atomize it
 	CodeGen.generate(atoms);
