@@ -23,8 +23,9 @@ public class FileInputOutput {
                 output += atom.toString() + "\n";
                 fos.write(output.getBytes(StandardCharsets.UTF_8));
             }
-            System.out.println("\nResults have been written to '" + fileName + "-atomOutput.txt'");
-            return fileName;
+            String filePath = fileName + "-output.atoms";
+            System.out.println("\nResults have been written to '" + filePath + "\nand " + fileName + "atomOutput.txt");
+            return filePath;
         } catch (IOException e) {
             System.out.println("\nError writing to file: " + e.getMessage());
     }
@@ -40,8 +41,8 @@ public class FileInputOutput {
     {
         ArrayList<Atom> atoms = new ArrayList<>();
         // Parse the atoms from the file
-        try (FileInputStream fis = new FileInputStream(fileName + "-output.atoms")) {
-                System.out.println("Reading atoms in from file " + fileName + "-output.atoms"); //log
+        try (FileInputStream fis = new FileInputStream(fileName)) {
+                System.out.println("Reading atoms in from file " + fileName); //log
                 BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -65,7 +66,7 @@ public class FileInputOutput {
     {
         int loc = 0;
 
-        try (FileOutputStream fos = new FileOutputStream(fileName + "-output.txt")) {
+        try (FileOutputStream fos = new FileOutputStream(fileName + "-codegen_output.txt")) {
                 fos.write("Loc\tContents\t\tOP\n".getBytes()); // Write header to file
 
                 String output;
@@ -80,13 +81,13 @@ public class FileInputOutput {
                         break;  // end generation after HLT
                     }
                 }
-                System.out.println("\nLegible results have been written to '" + fileName + "-output.txt'");
+                System.out.println("\nLegible results have been written to '" + fileName + "-codegen_output.txt'");
             } catch (IOException e) {
                 System.out.println("Error writing to file: " + e.getMessage());
                 return null;
             }
 
-            return fileName + "-output.txt";
+            return fileName + "-codegen_output.txt";
     }
 
     /**
@@ -97,7 +98,7 @@ public class FileInputOutput {
     public String codeGenBinOutput(String fileName, ArrayList<Code> codeList)
     {
             
-        try(FileOutputStream file2 = new FileOutputStream(fileName + "-output.bin")) {
+        try(FileOutputStream file2 = new FileOutputStream(fileName + "-codegen_output.bin")) {
             for (Code code : codeList) {
                 String binaryString = code.toBinaryString();
 
@@ -115,13 +116,13 @@ public class FileInputOutput {
                     file2.write(b);
                 }
             }
-            System.out.println("\nResults have been written to '" + fileName + "-output.bin' Hex editor needed to view content");
+            System.out.println("\nResults have been written to '" + fileName + "-codegen_output.bin' Hex editor needed to view content");
         } catch (IOException e) {
             System.out.println("Error writing to file: " + e.getMessage());
             return null;
         }
 
-        return fileName + "-output.bin";
+        return fileName + "-codegen_output.bin";
     }
 
 

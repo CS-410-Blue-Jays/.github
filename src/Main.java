@@ -2,11 +2,9 @@
 public class Main {
   public static void main(String[] args){
 
-	Frontend frontend = new Frontend();
-	String atom_output_fileName = frontend.executeFrontend();
+	UI ui = new UI();
+	ui.execute();
 	
-	Backend backend = new Backend(atom_output_fileName);
-	backend.main(args);
 
 	} // End of main
-} // End of class
+} // End of classy

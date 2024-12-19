@@ -2,8 +2,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 public class Frontend {
     
@@ -12,61 +10,62 @@ public class Frontend {
      * Runs everything from user input to atom file output
      * @return fileName of outputted atoms
      */
-    public static String executeFrontend()
-    {
-        
-        // Testing out Jframe
-        JFrame codeCompiler = new JFrame();
-
-        // File Chooser
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir") + "/src/"));
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text files", "c"));
-        int returnValue = fileChooser.showOpenDialog(codeCompiler);
-        String path = "";
-
-        // If a file is selected, get the path
-        if (returnValue == JFileChooser.APPROVE_OPTION)
-            path = fileChooser.getSelectedFile().getAbsolutePath();
-        
+    public static String executeFrontend(String defaultPath) {
+        System.out.println("Validating file path: " + defaultPath); //src/HelloWorld.c
+    
+        if (defaultPath == null || defaultPath.trim().isEmpty()) {
+            System.out.println("The given file path is null or empty, terminating frontend...");
+            System.exit(1);
+        }
+    
+        File newFile = new File(defaultPath);
+        if (!newFile.exists() || !newFile.isFile()) {
+            System.out.println("The given file path is invalid or does not point to a file, terminating frontend...");
+            System.exit(1);
+        }
+    
+        if (!newFile.canRead()) {
+            System.out.println("The file cannot be read due to insufficient permissions, terminating frontend...");
+            System.exit(1);
+        }
+    
+        String fileName = newFile.getName();
+        if (!fileName.contains(".")) {
+            System.out.println("The file has no extension, terminating frontend...");
+            System.exit(1);
+        }
+        fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    
         ArrayList<Token> tokens = new ArrayList<>();
-        File newFile = new File(path);
-        String fileName = newFile.getName().substring(0, newFile.getName().lastIndexOf('.'));
-
-        // Read the file and tokenize it
-        try (RandomAccessFile file = new RandomAccessFile(newFile.getAbsolutePath(), "r")) {
+    
+        try (RandomAccessFile file = new RandomAccessFile(newFile, "r")) {
             System.out.println("Tokenizing file: '" + newFile.getName() + '\'');
-
-            // Append each line to the total input
-            String input = "";
-
+    
+            StringBuilder inputBuilder = new StringBuilder();
             String line;
-            while((line = file.readLine()) != null)
-                input += line + '\n';
-            tokens.addAll(Scanner.scan(input));
-            file.close();
-        } catch(IOException e){
-            String error = e.getLocalizedMessage();
-            System.out.println("Error reading file '"+ newFile.getName() + "': " + error.substring(error.indexOf('(') + 1, error.length()-1) + ", check the file path and try again.");
+            while ((line = file.readLine()) != null) {
+                inputBuilder.append(line).append('\n');
+            }
+            tokens.addAll(Scanner.scan(inputBuilder.toString()));
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
             System.exit(-1);
         }
-
-        // Once all tokens are found, print them
-        if(tokens.isEmpty()){
+    
+        if (tokens.isEmpty()) {
             System.err.println("No tokens found! Try pointing to a different file.");
             System.exit(1);
         }
-        for(Token tok : tokens)
-            System.out.println(tok.toString());
-
-        // Parse the tokens
+    
+        tokens.forEach(System.out::println);
+    
         System.out.println("\nParsing tokens...");
         ArrayList<Atom> atoms = Parser.parse(tokens);
-
-        FileInputOutput fio = new FileInputOutput(); //init class, saves space in main.java
-
-	    String atom_output_fileName = fio.atomOutput(atoms, fileName);	// atom output to file
-
-        return atom_output_fileName;
+    
+        FileInputOutput fio = new FileInputOutput();
+        String atomOutputFileName = fio.atomOutput(atoms, fileName);
+    
+        return atomOutputFileName;
     }
+    
 }
