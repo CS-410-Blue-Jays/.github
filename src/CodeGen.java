@@ -112,7 +112,7 @@ public class CodeGen {
     }
 
     public static void parseJMP(Atom current){
-        int data = parseReg(current.checkRight()); // Destination
+        int data = label_table.get(current.checkDestination()); // Destination
         Code newInstruction = new Code(Code.Operation.JMP.ordinal(), data); // Make the instruction
         code.add(newInstruction);
     }
@@ -123,18 +123,17 @@ public class CodeGen {
 
     public static void parseTST(Atom current){
         int data = parseReg(current.checkRight());
-        int cmp = parseReg(current.checkComparator());
-        int reg = parseReg(current.checkResult());
+        int cmp = current.checkComparatorNum();
+        int reg = parseReg(current.checkLeft());
         Code newInstruction = new Code(Code.Operation.CMP.ordinal(), cmp, reg, data);
         code.add(new Code(Code.Operation.LOD.ordinal(), reg, parseReg(current.checkLeft())));
         code.add(newInstruction);
-
     }
 
     public static void parseMOV(Atom current){ // ~ Brandon
-        int data = parseReg(current.checkRight());
+        int data = parseReg(current.checkLeft());
         int reg = parseReg(current.checkResult());
-        Code newInstruction = new Code(Code.Operation.LOD.ordinal(), reg, data);
+        Code newInstruction = new Code(Code.Operation.STO.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
@@ -149,8 +148,7 @@ public class CodeGen {
             return vars.indexOf(reg);
         } else if (vars.size() != 16){
             vars.add(reg);
-            variable_table.put(reg, programCounter);
-            programCounter += 4;
+            variable_table.put(reg, programCounter++);
             return vars.indexOf(reg);
         } else {
             // If not, check if there are any available registers
