@@ -151,7 +151,7 @@ public class CodeGen {
 
         // Second, check if the variable name already has an associated register
         if(vars.contains(reg)){
-            return vars.indexOf(reg) - 1;
+            return vars.indexOf(reg);
         } else if (vars.size() != 16){
             vars.add(reg);
             variable_table.put(reg, programCounter);

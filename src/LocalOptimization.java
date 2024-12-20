@@ -30,6 +30,7 @@ public class LocalOptimization {
     }
    
     public static Code simpleOptimization(Code code){
+      //guard
       if(code == null){
         System.out.println("Code is null");
         return null;
@@ -41,12 +42,12 @@ public class LocalOptimization {
 
       int reg = code.checkReg();
       System.out.println("operator: " + operator);
+      System.out.println("DATA: " + data);
       // switch statement for different operations
       switch(operator){
         case "MUL":
           if(data == 1){ // Ex: x * 1 = x
             System.out.println("HIT!!!!!\n\n MUL case, code.checkReg() returns: " + code.checkReg() );
-            // Code newCode = new Code(Operat,  )
             return null;
           }
           break;
@@ -54,27 +55,21 @@ public class LocalOptimization {
           System.out.println("IN \"ADD\", Data = " + data);
           if(data == 0){ // Ex: x + 0 = x
             System.out.println("HIT!!!!!\n\n ADD case, code.checkReg() returns: " + code.checkReg() );
-
             return null;
           }
           break;
         case "SUB":
           if(data == 0){ // Ex: x - 0 = x
-            System.out.println("HIT!!!!!\n\n SUB case, code.checkReg() returns: " + code.checkReg() );
-
             return null;
           }
           break;
         case "DIV":
           if(data == 1){ // Ex x / 1 = x
-            System.out.println("\nHIT!!!!!\n DIV case, code.checkReg() returns: " + code.checkReg() );
-
             return null;
           }
           break;
         default:
-          System.out.println("No match found for operator: " + operator);
-
+          // System.out.println("No match found for operator: " + operator); debug log
           break;
       }
 
