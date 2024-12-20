@@ -2,6 +2,7 @@
 (LBL, , , , LBL0)
 (TST, g, 2, , 5, LBL1)
 (MOV, 0, , a)
+(ADD, a, 0, a)
 (ADD, a, 3, a)
 (MOV, 10, , n)
 (SUB, n, 10, n)

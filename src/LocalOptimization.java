@@ -16,8 +16,9 @@ public class LocalOptimization {
       {
         Code newCode = optimize(code);
         if (newCode != null)
-        optimizedCode.add(newCode);
-        
+        {
+          optimizedCode.add(newCode);
+        }
       }
 
           return optimizedCode;
@@ -47,30 +48,31 @@ public class LocalOptimization {
       switch(operator){
         case "MUL":
           if(data == 1){ // Ex: x * 1 = x
-            System.out.println("HIT!!!!!\n\n MUL case, code.checkReg() returns: " + code.checkReg() );
             return null;
           }
           break;
         case "ADD":
           System.out.println("IN \"ADD\", Data = " + data);
           if(data == 0){ // Ex: x + 0 = x
-            System.out.println("HIT!!!!!\n\n ADD case, code.checkReg() returns: " + code.checkReg() );
             return null;
           }
           break;
         case "SUB":
           if(data == 0){ // Ex: x - 0 = x
+            System.out.println(" HIT sub");
             return null;
           }
           break;
         case "DIV":
           if(data == 1){ // Ex x / 1 = x
+            System.out.println("HIT div");
             return null;
           }
           break;
         default:
           // System.out.println("No match found for operator: " + operator); debug log
           break;
+
       }
 
       // return original code if no optimization is needed

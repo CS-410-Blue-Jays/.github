@@ -34,25 +34,27 @@ public class UI {
     {
         String filePath = "src/input/HelloWorld.c";
 
-        System.out.println("Hit enter to continue...");
-        System.console().readPassword();
+        // System.out.println("Hit enter to continue...");
+        // System.console().readPassword();
 
         // Clear the screen and flush console
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+        // System.out.print("\033[H\033[2J");
+        // System.out.flush();
 
         //handle file path
         System.out.println("Would you like to set the default file path to scan and parse for HelloWorld.c? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
         if(!response.equals("Y"))
         {        
-            System.out.print("\033[H\033[2J");
+            // System.out.print("\033[H\033[2J");
 
             prompt.nextLine();
+            
             //set new file path
+
             System.out.println("Enter new filepath for the file you would like to run the frontend applcation on: (example.c)");
             response = prompt.nextLine().trim();
-            
+            System.out.println(response + " received");
             //validate file path 
             File file = new File(response);
 
@@ -99,7 +101,7 @@ public class UI {
         {
             //set new file path
             System.out.println("Enter new filepath for the file you would like to run the frontend applcation on: (example.txt) ");
-            response = prompt.nextLine();
+            response = prompt.nextLine().trim();
             
             //validate file path 
             File file = new File(response);
@@ -137,7 +139,10 @@ public class UI {
         System.out.println("Done.\n\nWould you like to enable Global Optimization (Reduction in Strength)? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
         if(response.equals("Y"))
+        {
+            System.out.println("Performing Local Optimization");
             atoms = GlobalOptimization.optimizeAtoms(atoms);
+        }
 
         String atom_output_fileName = fio.atomOutput(atoms, filePath.split("/")[2]);
 
@@ -153,8 +158,10 @@ public class UI {
 
         System.out.println("Would you like to enable Local Optimization? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
-        if(response.equals("Y")){}
-            // code = GlobalOptimization.optimizeCode(code);
+        if(response.equals("Y")){
+            code = LocalOptimization.optimizeCode(code);
+            System.out.println("Performing Local Optimization");
+        }
 
         fio.codeGenTxtOutput(fileName + "-output.txt", code);	//codeGen output to .txt
 
@@ -175,7 +182,7 @@ public class UI {
         prompt.nextLine();
         //set new file path
         System.out.println("Enter new filepath for the file you would like to run the virtual machine on: (example.bin) ");
-        response = prompt.nextLine();
+        response = prompt.nextLine().trim();
 
         String fileName = "";
         //validate file path 
