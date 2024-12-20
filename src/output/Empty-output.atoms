@@ -1,7 +1,0 @@
-(ADD, a, 0, a)
-(ADD, a, 0, a)
-(ADD, a, 0, a)
-(ADD, a, 3, a)
-(SUB, b, 0, b)
-(MUL, c, 1, c)
-(DIV, c, 1, c)
