@@ -87,7 +87,7 @@ class GlobalOptimization {
             System.out.println("Optimization made to " +atom.checkOperator()+ "; Bitwise shift");
 
             int numShifts = logBase2(right);
-            String newLeft = Integer.toString(left << numShifts);
+            String newLeft = Integer.toString(left << numShifts);       //REDUCTION IN STRENGTH '*' to '<<'
             return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
            }
 

@@ -149,9 +149,6 @@ public class UI {
 
            String atom_output_fileName = fio.atomOutput(atoms, filePath);
 
-
-
-
             System.out.println("Frontend done executing");
             return atom_output_fileName;
         }
