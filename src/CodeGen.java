@@ -46,7 +46,6 @@ public class CodeGen {
             for(String var : variable_table.keySet())
                 System.out.println(var + "\t" + variable_table.get(var));
         }
-
         return code;
     }
 
@@ -147,7 +146,7 @@ public class CodeGen {
 
         // Second, check if the variable name already has an associated register
         if(vars.contains(reg)){
-            return vars.indexOf(reg) - 1;
+            return vars.indexOf(reg);
         } else if (vars.size() != 16){
             vars.add(reg);
             variable_table.put(reg, programCounter);
