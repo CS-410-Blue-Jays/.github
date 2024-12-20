@@ -1,21 +1,22 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class LocalOptimization {
 
-  private static ArrayList<Code> optimizedCode;
-  private static Code code;
+  private static ArrayList<Code> optimizedCode = new ArrayList<>();
+  // private static Code code;
 
-    public static ArrayList<Code> optimizeCode(ArrayList<Code> optimizedCode){
-        for (Code code : optimizedCode)
-            {
-                optimize(code);
-                if (code != null)
-                optimizedCode.add(code);
-            }
+    public static ArrayList<Code> optimizeCode(ArrayList<Code> unOptimizedCode){
+      for (Code code : unOptimizedCode)
+      {
+        Code newCode = optimize(code);
+        if (newCode != null)
+        optimizedCode.add(newCode);
+        
+      }
 
-            return optimizedCode;
+          return optimizedCode;
     }
+    
     public static Code optimize(Code code){
       Code optimizedCode;
       optimizedCode = simpleOptimization(code);

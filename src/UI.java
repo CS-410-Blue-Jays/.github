@@ -7,6 +7,7 @@ public class UI {
     
         static java.util.Scanner prompt = new java.util.Scanner(System.in);
         
+        static FileInputOutput fio = new FileInputOutput();
         
         public void execute()
         {
@@ -142,10 +143,7 @@ public class UI {
 
            atoms = GlobalOptimization.optimizeAtoms(atoms);
 
-           FileInputOutput fio = new FileInputOutput();
-
-
-           System.out.println("EXPECTING NEW FILE OF OPTIMIZED ATOMS AT : " + filePath);
+           System.out.println("EXPECTING NEW FILE OF OPTIMIZED ATOMS AT : " + filePath);    
 
            String atom_output_fileName = fio.atomOutput(atoms, filePath);
 
@@ -160,8 +158,20 @@ public class UI {
         {
             // Backend backend = new Backend(atom_output_fileName);
             // backend.setFileName(atom_output_fileName);	//possibly prompt user for this...
-            String codeGen_output_file = Backend.executeBackend(atom_output_fileName);
-            return codeGen_output_file;
+            ArrayList<Code> codeList = Backend.executeBackend(atom_output_fileName);
+
+            System.out.println("Code has been generated, would you like to optimize the code?");
+
+            //yes -- needs prompting for flags
+            codeList = LocalOptimization.optimizeCode(codeList);
+
+            String new_codeGen_output_file = atom_output_fileName.split("-")[0].concat("-finalCodeGen.output.txt");
+            String txtfile = fio.codeGenTxtOutput(new_codeGen_output_file, codeList);	//codeGen output to .txt
+        
+            String fiofilename = atom_output_fileName.split("-")[0].concat("-finalCodeGen.output.bin");
+            String output_bin_fileName = fio.codeGenBinOutput(fiofilename, codeList);	//codeGen output to .bin
+            
+            return output_bin_fileName;
         }
     
         public void runVM(String defaultFile)

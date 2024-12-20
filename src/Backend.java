@@ -12,7 +12,7 @@ public class Backend {
     public String getFileName(){return fileName;}
     public void setFileName(String fileName){this.fileName = fileName; }
 
-    public static String executeBackend(String fileName)
+    public static ArrayList<Code> executeBackend(String fileName)
     {
         ArrayList<Atom> atoms = new ArrayList<>(); // create atom list
         FileInputOutput fio = new FileInputOutput();    //allows access to file input and output methods
@@ -26,10 +26,7 @@ public class Backend {
 
         System.out.println("\nGenerating Mini Architecture code...");
 
-        String output_txt_fileName = fio.codeGenTxtOutput(fileName, codeList);	//codeGen output to .txt
-        
-        String output_bin_fileName = fio.codeGenBinOutput(fileName, codeList);	//codeGen output to .bin
-        
-        return output_bin_fileName;
+
+        return codeList;
     }
 }
