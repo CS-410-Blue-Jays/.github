@@ -111,4 +111,10 @@ public class Code {
     public final int checkData() {
         return (int) (this.code % 100000);
     }
+
+    //32 bits - 8 digits, need the 3rd digit and 9-12 bits
+    public final int checkReg(){
+        
+        return (Integer.parseInt(Long.toString(this.code)) / 100000) % 10;
+    }
 }

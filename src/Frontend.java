@@ -51,7 +51,7 @@ public class Frontend {
             System.out.println("Error reading file: " + e.getMessage());
             System.exit(-1);
         }
-    
+
         if (tokens.isEmpty()) {
             System.err.println("No tokens found! Try pointing to a different file.");
             System.exit(1);
@@ -61,6 +61,13 @@ public class Frontend {
     
         System.out.println("\nParsing tokens...");
         ArrayList<Atom> atoms = Parser.parse(tokens);
+        
+
+        for(Atom atom: atoms)
+        {
+            System.out.println("ATOMS: " + atom.toString());
+
+        }
         
         return atoms;
     }

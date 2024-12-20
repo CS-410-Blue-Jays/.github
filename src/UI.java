@@ -141,9 +141,7 @@ public class UI {
             //Prompt user if they want to optimize...
             System.out.println("Would you like to run the reduction in strength optimizer?");
 
-           atoms = GlobalOptimization.optimizeAtoms(atoms);
-
-           System.out.println("EXPECTING NEW FILE OF OPTIMIZED ATOMS AT : " + filePath);    
+           atoms = GlobalOptimization.optimizeAtoms(atoms);   
 
            String atom_output_fileName = fio.atomOutput(atoms, filePath);
 
