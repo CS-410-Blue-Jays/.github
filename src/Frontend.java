@@ -4,8 +4,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 public class Frontend {
-    
-   
     /**
      * Runs everything from user input to atom file output
      * @return fileName of outputted atoms
@@ -56,9 +54,8 @@ public class Frontend {
             System.exit(1);
         }
     
-        tokens.forEach(System.out::println);
-
-        // output tokens to a file cause why not
+        FileInputOutput fio = new FileInputOutput();
+        fio.tokenOutput(tokens, fileName);
     
         System.out.println("\nParsing tokens...");
         ArrayList<Atom> atoms = Parser.parse(tokens);

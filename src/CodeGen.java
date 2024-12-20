@@ -8,7 +8,6 @@ public class CodeGen {
         
         testAtoms.add(new Atom(Atom.Operation.MOV, "4", "g"));
         testAtoms.add(new Atom(Atom.Operation.LBL, "LBL0"));
-        testAtoms.add(new Atom(Atom.Operation.TST, "g", "2", "LBL1", 2));
         testAtoms.add(new Atom(Atom.Operation.ADD, "4", "2", "h"));
         testAtoms.add(new Atom(Atom.Operation.MUL, "4", "4", "j"));
         testAtoms.add(new Atom(Atom.Operation.DIV, "30", "5", "k"));
@@ -26,6 +25,8 @@ public class CodeGen {
 
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
+
+        code.add(new Code(Code.Operation.CLR.ordinal(), 1)); // Point to starting address
         parseCode();
 
         if(label_table.isEmpty()) {
@@ -61,6 +62,7 @@ public class CodeGen {
 
     public static void parseAtom(){
         Atom curr = getCurrentAtom();
+        System.out.println(curr);
         switch(curr.checkOperator()){
             case "ADD" -> parseADD(curr);
             case "SUB" -> parseSUB(curr);
