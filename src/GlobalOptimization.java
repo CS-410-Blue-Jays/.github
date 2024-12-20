@@ -1,8 +1,9 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 class GlobalOptimization {
     
-    public static List<Atom> optimizeAtoms(List<Atom> atoms){
+    public static ArrayList<Atom> optimizeAtoms(ArrayList<Atom> atoms){
         
         ArrayList<Atom> optimizedAtoms = new ArrayList<Atom>();
 

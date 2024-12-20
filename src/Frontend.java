@@ -10,7 +10,7 @@ public class Frontend {
      * Runs everything from user input to atom file output
      * @return fileName of outputted atoms
      */
-    public static String executeFrontend(String defaultPath) {
+    public static ArrayList<Atom> executeFrontend(String defaultPath) {
         System.out.println("Validating file path: " + defaultPath); //src/HelloWorld.c
     
         if (defaultPath == null || defaultPath.trim().isEmpty()) {
@@ -61,11 +61,8 @@ public class Frontend {
     
         System.out.println("\nParsing tokens...");
         ArrayList<Atom> atoms = Parser.parse(tokens);
-    
-        FileInputOutput fio = new FileInputOutput();
-        String atomOutputFileName = fio.atomOutput(atoms, fileName);
-    
-        return atomOutputFileName;
+        
+        return atoms;
     }
     
 }

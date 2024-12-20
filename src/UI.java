@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class UI {
     
@@ -130,14 +131,27 @@ public class UI {
             return filepath;
 
         }
-
-
       
         
         public String runFrontend(String filePath)
         {
+            ArrayList<Atom> atoms = Frontend.executeFrontend(filePath);
 
-            String atom_output_fileName = Frontend.executeFrontend(filePath);
+            //Prompt user if they want to optimize...
+            System.out.println("Would you like to run the reduction in strength optimizer?");
+
+           atoms = GlobalOptimization.optimizeAtoms(atoms);
+
+           FileInputOutput fio = new FileInputOutput();
+
+
+           System.out.println("EXPECTING NEW FILE OF OPTIMIZED ATOMS AT : " + filePath);
+
+           String atom_output_fileName = fio.atomOutput(atoms, filePath);
+
+
+
+
             System.out.println("Frontend done executing");
             return atom_output_fileName;
         }
