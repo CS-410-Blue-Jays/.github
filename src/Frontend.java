@@ -11,7 +11,7 @@ public class Frontend {
      * @return fileName of outputted atoms
      */
     public static ArrayList<Atom> executeFrontend(String defaultPath) {
-        System.out.println("Validating file path: " + defaultPath); //src/HelloWorld.c
+        System.out.println("\nValidating file path: " + defaultPath); //src/HelloWorld.c
     
         if (defaultPath == null || defaultPath.trim().isEmpty()) {
             System.out.println("The given file path is null or empty, terminating frontend...");
@@ -34,12 +34,11 @@ public class Frontend {
             System.out.println("The file has no extension, terminating frontend...");
             System.exit(1);
         }
-        fileName = fileName.substring(0, fileName.lastIndexOf('.'));
     
         ArrayList<Token> tokens = new ArrayList<>();
     
         try (RandomAccessFile file = new RandomAccessFile(newFile, "r")) {
-            System.out.println("Tokenizing file: '" + newFile.getName() + '\'');
+            System.out.println("\nTokenizing file: '" + newFile.getName() + '\'');
     
             StringBuilder inputBuilder = new StringBuilder();
             String line;
@@ -58,6 +57,8 @@ public class Frontend {
         }
     
         tokens.forEach(System.out::println);
+
+        // output tokens to a file cause why not
     
         System.out.println("\nParsing tokens...");
         ArrayList<Atom> atoms = Parser.parse(tokens);

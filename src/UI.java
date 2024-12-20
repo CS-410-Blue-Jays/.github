@@ -7,7 +7,6 @@ public class UI {
     
         static java.util.Scanner prompt = new java.util.Scanner(System.in);
         
-        
         public void execute()
         {
             String startFile;
@@ -27,27 +26,19 @@ public class UI {
             
             runVM(path);
     
-        } 
+        }
         
         public String startPrompt()
         {
-            String filePath = "src/HelloWorld.c";
+            String filePath = "src/input/HelloWorld.c";
 
-            System.out.println("Would you like to execute the frontend?(Y/N)");
-            String response = prompt.next().trim().toUpperCase();
-            // prompt.close();
-            if(!response.equals("Y"))
-            {
-                System.out.println("The application will close now" );
-                System.exit(0);
-                return null;
-            }
-
-            System.out.println("Received: " + response);
+            System.out.println("Hit enter to continue...");
+            System.console().readPassword();
+            System.out.print("\u000C"); // Clear the screen
 
             //handle file path
             System.out.println("Would you like to set the default file path to scan and parse for HelloWorld.c?(Y/N)");
-            response = prompt.next().trim().toUpperCase();
+            String response = prompt.next().trim().toUpperCase();
             if(!response.equals("Y"))
             {
                 //set new file path
@@ -145,9 +136,9 @@ public class UI {
            FileInputOutput fio = new FileInputOutput();
 
 
-           System.out.println("EXPECTING NEW FILE OF OPTIMIZED ATOMS AT : " + filePath);
+            System.out.println("EXPECTING NEW FILE OF OPTIMIZED ATOMS AT : " + filePath);
 
-           String atom_output_fileName = fio.atomOutput(atoms, filePath);
+            String atom_output_fileName = fio.atomOutput(atoms, filePath);
 
 
 

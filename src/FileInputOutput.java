@@ -9,6 +9,10 @@ import java.util.ArrayList;
 
 public class FileInputOutput {
 
+    public String tokenOutput(ArrayList<String> tokens, String fileName){
+        
+    }
+
     /**
      * Takes an array of atoms and puts them in a file
      * @param atoms - arraylist to input
