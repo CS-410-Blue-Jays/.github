@@ -9,7 +9,7 @@ class GlobalOptimization {
         for (Atom atom : atoms)
             {
                 Atom newAtom = optimize(atom);
-                if (atom != null){
+                if (newAtom != null){
                     optimizedAtoms.add(newAtom);
                     System.out.println("Added optimized atom of type " +newAtom.checkOperator());
                 }
@@ -78,8 +78,8 @@ class GlobalOptimization {
             System.out.println("Optimization made to " +atom.checkOperator()+ "; Bitwise shift");
 
             int numShifts = logBase2(left);
-            String newLeft = Integer.toString(left << numShifts);
-            return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
+            String newRight = Integer.toString(right << numShifts);
+            return new Atom(Atom.Operation.MOV, newRight, atom.checkResult());
            }
 
            else if(isPowerOfTwo(right)){
@@ -87,8 +87,8 @@ class GlobalOptimization {
             System.out.println("Optimization made to " +atom.checkOperator()+ "; Bitwise shift");
 
             int numShifts = logBase2(right);
-            String newRight = Integer.toString(right << numShifts);
-            return new Atom(Atom.Operation.MOV, newRight, atom.checkResult());
+            String newLeft = Integer.toString(left << numShifts);
+            return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
            }
 
            //return null if no optimizations can be performed
