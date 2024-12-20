@@ -23,28 +23,27 @@ public class CodeGen {
     static ArrayList<String> vars = new ArrayList<>(); // Register numbers with variable names
     static HashMap<String, Integer> label_table = new HashMap<>(); // Table of all labels
     static HashMap<String, Integer> variable_table = new HashMap<>(); // Table of all variables
-    static boolean optimize = false;
 
-
-    public static void setOptimize(boolean flag){
-        optimize = true;
-      }
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
         parseCode();
 
-        System.out.println("\nLABEL TABLE\n");
-        System.out.println("LBL\tLocation");
-        for(String label : label_table.keySet())
-        {
-            System.out.println(label + "\t" + label_table.get(label));
+        if(label_table.isEmpty()) {
+            System.out.println("No labels found");
+        } else {
+            System.out.println("\nLABEL TABLE\n");
+            System.out.println("LBL\tLocation");
+            for(String label : label_table.keySet())
+                System.out.println(label + "\t" + label_table.get(label));
         }
         
-        System.out.println("\nVARIABLE TABLE\n");
-        System.out.println("VAR\tLocation");
-        for(String var : variable_table.keySet())
-        {
-            System.out.println(var + "\t" + variable_table.get(var));
+        if(variable_table.isEmpty()) {
+            System.out.println("No variables found");
+        } else {
+            System.out.println("\nVARIABLE TABLE\n");
+            System.out.println("VAR\tLocation");
+            for(String var : variable_table.keySet())
+                System.out.println(var + "\t" + variable_table.get(var));
         }
 
         return code;

@@ -9,8 +9,25 @@ import java.util.ArrayList;
 
 public class FileInputOutput {
 
-    public String tokenOutput(ArrayList<String> tokens, String fileName){
-        
+    /**
+     * Takes a file and outputs tokens parsed from it
+     * @param fileName - name of input file
+     * @return tokens list
+     */
+    public String tokenOutput(ArrayList<Token> tokens, String fileName){
+        String output = "";
+        try (FileOutputStream fos = new FileOutputStream("output/" + fileName + "-output.tokens")) {
+            for (Token token : tokens) {
+                output += token.toString() + "\n";
+                fos.write(output.getBytes(StandardCharsets.UTF_8));
+            }
+            String filePath = fileName + "-output.tokens";
+            System.out.println("\nResults have been written to '" + fileName);
+            return filePath;
+        } catch (IOException e) {
+            System.out.println("\nError writing to file: " + e.getMessage());
+    }
+        throw new IllegalStateException("FALL THROUGH!");
     }
 
     /**

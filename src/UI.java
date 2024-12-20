@@ -37,7 +37,10 @@ public class UI {
 
             System.out.println("Hit enter to continue...");
             System.console().readPassword();
-            System.out.print("\u000C"); // Clear the screen
+
+            // Clear the screen and flush console
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
 
             //handle file path
             System.out.println("Would you like to set the default file path to scan and parse for HelloWorld.c?(Y/N)");
@@ -81,7 +84,7 @@ public class UI {
             System.out.println("Would you like to execute the backend?(Y/N)");
             String response = prompt.next().trim().toUpperCase();
             // prompt.close();
-            if(!response.equals("Y"))
+            if(!response.toUpperCase().equals("Y"))
             {
                 System.out.println("The application will close now" );
                 System.exit(0);
