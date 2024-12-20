@@ -62,7 +62,6 @@ public class CodeGen {
 
     public static void parseAtom(){
         Atom curr = getCurrentAtom();
-        System.out.println(curr);
         switch(curr.checkOperator()){
             case "ADD" -> parseADD(curr);
             case "SUB" -> parseSUB(curr);
@@ -74,7 +73,6 @@ public class CodeGen {
             case "MOV" -> parseMOV(curr);
             default -> throw new RuntimeException("Invalid operation: " + curr.checkOperator());
         }
-        programCounter++;
         advance(); // Move to the next atom
     }
 
@@ -121,10 +119,7 @@ public class CodeGen {
     }
 
     public static void parseLBL(Atom current){
-        System.out.println("LBL detected");
-        // Do things here
-     
-
+        label_table.put(current.checkDestination(), atoms.indexOf(current)); // Add the label to the table
     }
 
     public static void parseTST(Atom current){
@@ -156,7 +151,7 @@ public class CodeGen {
         } else if (vars.size() != 16){
             vars.add(reg);
             variable_table.put(reg, programCounter);
-            System.out.println("Adding variable " +reg+ " at location " +programCounter);
+            programCounter += 4;
             return vars.indexOf(reg);
         } else {
             // If not, check if there are any available registers

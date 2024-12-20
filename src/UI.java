@@ -75,7 +75,7 @@ public class UI {
         String filepath = defaultPath;
 
         //take in new path if necessary
-        System.out.println("Would you like to execute the backend?(Y/N)");
+        System.out.println("Would you like to execute the backend? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
         // prompt.close();
         if(!response.equals("Y"))
@@ -85,15 +85,13 @@ public class UI {
             return null;
         }
 
-        System.out.println("Received: " + response);
-
         //handle file path
-        System.out.println("Would you like to accept the default file path for the backend as: " + defaultPath + "?(Y/N)");
+        System.out.println("Would you like to accept the default file path \nfor the backend as: " + defaultPath + "? (Y/N)");
         response = prompt.next().trim().toUpperCase();
         if(!response.equals("Y"))
         {
             //set new file path
-            System.out.println("Enter new filepath for the file you would like to run the frontend applcation on: (example.txt)");
+            System.out.println("Enter new filepath for the file you would like to run the frontend applcation on: (example.txt) ");
             response = prompt.nextLine();
             
             //validate file path 
@@ -129,14 +127,14 @@ public class UI {
         ArrayList<Atom> atoms = Frontend.executeFrontend(filePath);
 
         //Prompt user if they want to optimize...
-        System.out.println("Would you like to enable Global Optimization (Reduction in Strength)?");
+        System.out.println("Done.\n\nWould you like to enable Global Optimization (Reduction in Strength)? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
         if(response.equals("Y"))
             atoms = GlobalOptimization.optimizeAtoms(atoms);
 
         String atom_output_fileName = fio.atomOutput(atoms, filePath.split("/")[2]);
 
-        System.out.println("Frontend done executing");
+        System.out.println("\nFrontend has finished.\n");
         return atom_output_fileName;
     }
     
@@ -146,7 +144,7 @@ public class UI {
         // backend.setFileName(atom_output_fileName);	//possibly prompt user for this...
         ArrayList<Code> code = Backend.executeBackend(fileName);
 
-        System.out.println("Code has been generated, would you like to optimize the code?");
+        System.out.println("Would you like to enable Local Optimization? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
         if(response.equals("Y")){}
             // code = GlobalOptimization.optimizeCode(code);
@@ -170,7 +168,6 @@ public class UI {
         } catch (Exception e) {
             System.out.println("Error executing MiniVM: " + e.getMessage());
         }
-
         System.exit(1);
     }
     
