@@ -13,17 +13,21 @@ public class UI {
         String startFile;
         String default_file_for_backend;
         String default_file_for_VM;
-        ASCII_ART();
-        startFile = startPrompt();
-        default_file_for_backend = runFrontend(startFile);
-        
-        default_file_for_backend = preBackendPrompt(default_file_for_backend);
-        default_file_for_VM = runBackend(default_file_for_backend);
+        ASCII_ART();        //start
 
-        System.out.println("default_file_for_VM: " + default_file_for_VM);
-        String path = validateFilePath(default_file_for_VM);
+
+        startFile = startPrompt();      //prompt
+        default_file_for_backend = runFrontend(startFile); //frontend
+        
+        default_file_for_backend = preBackendPrompt(default_file_for_backend);      //prompt
+        default_file_for_VM = runBackend(default_file_for_backend);         //backend
+
+        default_file_for_backend = vmPrompt(default_file_for_backend);
+        System.out.println("default_file_for_VM: " + default_file_for_VM);      
+        String path = validateFilePath(default_file_for_VM);        //virtual machine
         
         runVM(path);
+
     }
     
     public String startPrompt()
@@ -41,10 +45,13 @@ public class UI {
         System.out.println("Would you like to set the default file path to scan and parse for HelloWorld.c? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
         if(!response.equals("Y"))
-        {
+        {        
+            System.out.print("\033[H\033[2J");
+
+            prompt.nextLine();
             //set new file path
             System.out.println("Enter new filepath for the file you would like to run the frontend applcation on: (example.c)");
-            response = prompt.nextLine().toLowerCase();
+            response = prompt.nextLine().trim();
             
             //validate file path 
             File file = new File(response);
@@ -60,7 +67,7 @@ public class UI {
                     System.exit(1);
                 }
             } else {
-                System.out.println("The path does not exist.");
+                System.out.println("The path does not exist. The application will close now.");
                 System.exit(1);
             }
         }
@@ -152,6 +159,44 @@ public class UI {
         fio.codeGenTxtOutput(fileName + "-output.txt", code);	//codeGen output to .txt
 
         return fio.codeGenBinOutput(fileName + "-output.bin", code);	//codeGen output to .bin
+    }
+
+       
+    public String vmPrompt(String filePath)
+    {
+        //Prompt user if they want to optimize...
+        System.out.println("\n\nWould you like to accept the default file path for the virtual machine as: " + filePath + "? (Y/N)\"");
+        String response = prompt.next().trim().toUpperCase();
+        if(response.equals("Y"))
+            return filePath;
+        
+        //else
+
+        prompt.nextLine();
+        //set new file path
+        System.out.println("Enter new filepath for the file you would like to run the virtual machine on: (example.bin) ");
+        response = prompt.nextLine();
+
+        String fileName = "";
+        //validate file path 
+        File file = new File(response);
+
+        // Check if the file exists
+        if (file.exists()) {
+            // Check if it is a file or a directory
+            if (file.isFile()) {
+                System.out.println("The path is a valid file."); 
+                fileName = response;        //set filepath and break
+            } else {
+                System.out.println("The path exists but is not a file");
+                System.exit(1);
+            }
+        } else {
+            System.out.println("The path does not exist.");
+            System.exit(1);
+        }
+
+        return fileName;
     }
 
     public void runVM(String defaultFile)

@@ -170,7 +170,9 @@ class GlobalOptimization {
         if (n <= 0) {
             return false;
         }
-
+        int logic = (n & (n - 1));
+        boolean result = (logic == 0);
+        System.out.println(logic + " equals 0 ??? " + result);
         return (n & (n - 1)) == 0;
     }
 

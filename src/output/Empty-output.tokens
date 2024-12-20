@@ -1,0 +1,6 @@
+Token[type='IDENTIFIER', value='n']
+Token[type='OPERATOR', value='=']
+Token[type='LITERAL', value='10']
+Token[type='OPERATOR', value='*']
+Token[type='LITERAL', value='100']
+Token[type='SEMICOLON', value=';']
