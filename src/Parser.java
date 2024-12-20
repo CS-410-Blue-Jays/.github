@@ -320,16 +320,16 @@ private static boolean isOperator(Token token) {
     // If there are more tokens after the right operand (not closing parenthesis or semicolon), we are not finished
     if(!getCurrentToken().type.equals(TokenType.CLOSE_PARENTHESIS) && !getCurrentToken().type.equals(TokenType.SEMICOLON)){
       if(accept(TokenType.OPERATOR, "&&")){
-        atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX, cmp)); // Add the current atom
+        atoms.add(new Atom(Atom.Operation.TST, left, right, cmp, "LBL" + LABEL_INDEX)); // Add the current atom
         parseCondition(); // Recursive call
       } else {
         expect(TokenType.OPERATOR, "||");
-        atoms.add(new Atom(Atom.Operation.TST, left, right, "OR_" + OR_INDEX, cmp)); // Add the current atom with new label
+        atoms.add(new Atom(Atom.Operation.TST, left, right, cmp, "OR_" + OR_INDEX)); // Add the current atom with new label
         atoms.add(new Atom(Atom.Operation.LBL, "OR_" + OR_INDEX++));
         parseCondition(); // Recursive call 
       }
     } else
-      atoms.add(new Atom(Atom.Operation.TST, left, right, "LBL" + LABEL_INDEX, cmp)); // Add the current atom
+      atoms.add(new Atom(Atom.Operation.TST, left, right, cmp, "LBL" + LABEL_INDEX)); // Add the current atom
   }
 
   // Method to parse comparators

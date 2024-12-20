@@ -17,7 +17,6 @@ class GlobalOptimization {
                 //debugging statement
                 //if it doesn't add an oprtimized atom, print that
                 else{
-                    System.out.println("Atom not optimized");
                     //add the original atom, since no otimizations could be made
                     optimizedAtoms.add(atom);
                 }

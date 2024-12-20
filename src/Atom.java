@@ -23,13 +23,18 @@ public class Atom {
 
   public static Atom parseString(String line) {
     String[] parts = line.split(",");
-    return switch (parts.length) {
-      case 2 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1, parts[1].length() - 1));
-      case 3 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1, parts[2].length() - 1));
-      case 4 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1), parts[3].substring(1, parts[3].length() - 1));
-      case 5 -> new Atom(Operation.valueOf(parts[0]), parts[1].substring(1), parts[2].substring(1), parts[3].substring(1), Integer.parseInt(parts[4].substring(1, parts[4].length() - 1)));
-      default -> null;
-    };
+    try {
+      return switch (parts.length) {
+        case 2 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1, parts[1].length() - 1));
+        case 3 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1, parts[2].length() - 1));
+        case 4 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1), parts[3].substring(1, parts[3].length() - 1));
+        case 5 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1), Integer.parseInt(parts[3].substring(1)), parts[4].substring(1, parts[4].length() - 1));
+        case 6 -> new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1), Integer.parseInt(parts[4].substring(1)), parts[5].substring(1, parts[4].length() - 1));
+        default -> null;
+      };
+    } catch (NumberFormatException e) {
+      return new Atom(Operation.valueOf(parts[0].substring(1)), parts[1].substring(1), parts[2].substring(1), 0, parts[4].substring(1, parts[4].length() - 1));
+    }
   }
   
   // Constructor for add/sub/mul/div operations
@@ -56,7 +61,7 @@ public class Atom {
 
   // Constructor for condition test operationns ( TST )
   // Example (TST, "A", "B", "label", 1) -> If A == B, jump to label
-  public Atom(Operation operation, String left, String right, String destination, int comparison){
+  public Atom(Operation operation, String left, String right, int comparison, String destination){
     this.operation = operation;
     this.left = left;
     this.right = right;

@@ -8,7 +8,6 @@ public class CodeGen {
         
         testAtoms.add(new Atom(Atom.Operation.MOV, "4", "g"));
         testAtoms.add(new Atom(Atom.Operation.LBL, "LBL0"));
-        testAtoms.add(new Atom(Atom.Operation.TST, "g", "2", "LBL1", 2));
         testAtoms.add(new Atom(Atom.Operation.ADD, "4", "2", "h"));
         testAtoms.add(new Atom(Atom.Operation.MUL, "4", "4", "j"));
         testAtoms.add(new Atom(Atom.Operation.DIV, "30", "5", "k"));
@@ -23,30 +22,30 @@ public class CodeGen {
     static ArrayList<String> vars = new ArrayList<>(); // Register numbers with variable names
     static HashMap<String, Integer> label_table = new HashMap<>(); // Table of all labels
     static HashMap<String, Integer> variable_table = new HashMap<>(); // Table of all variables
-    static boolean optimize = false;
 
-
-    public static void setOptimize(boolean flag){
-        optimize = true;
-      }
     public static ArrayList<Code> generate(ArrayList<Atom> insertedAtoms) {
         atoms = insertedAtoms;
+
+        code.add(new Code(Code.Operation.CLR.ordinal(), 1)); // Point to starting address
         parseCode();
 
-        System.out.println("\nLABEL TABLE\n");
-        System.out.println("LBL\tLocation");
-        for(String label : label_table.keySet())
-        {
-            System.out.println(label + "\t" + label_table.get(label));
+        if(label_table.isEmpty()) {
+            System.out.println("No labels found");
+        } else {
+            System.out.println("\nLABEL TABLE\n");
+            System.out.println("LBL\tLocation");
+            for(String label : label_table.keySet())
+                System.out.println(label + "\t" + label_table.get(label));
         }
         
-        System.out.println("\nVARIABLE TABLE\n");
-        System.out.println("VAR\tLocation");
-        for(String var : variable_table.keySet())
-        {
-            System.out.println(var + "\t" + variable_table.get(var));
+        if(variable_table.isEmpty()) {
+            System.out.println("No variables found");
+        } else {
+            System.out.println("\nVARIABLE TABLE\n");
+            System.out.println("VAR\tLocation");
+            for(String var : variable_table.keySet())
+                System.out.println(var + "\t" + variable_table.get(var));
         }
-
         return code;
     }
 
@@ -73,7 +72,6 @@ public class CodeGen {
             case "MOV" -> parseMOV(curr);
             default -> throw new RuntimeException("Invalid operation: " + curr.checkOperator());
         }
-        programCounter++;
         advance(); // Move to the next atom
     }
 
@@ -114,32 +112,28 @@ public class CodeGen {
     }
 
     public static void parseJMP(Atom current){
-        int data = parseReg(current.checkRight()); // Destination
+        int data = label_table.get(current.checkDestination()); // Destination
         Code newInstruction = new Code(Code.Operation.JMP.ordinal(), data); // Make the instruction
         code.add(newInstruction);
     }
 
     public static void parseLBL(Atom current){
-        System.out.println("LBL detected");
-        // Do things here
-     
-
+        label_table.put(current.checkDestination(), atoms.indexOf(current)); // Add the label to the table
     }
 
     public static void parseTST(Atom current){
         int data = parseReg(current.checkRight());
-        int cmp = parseReg(current.checkComparator());
-        int reg = parseReg(current.checkResult());
+        int cmp = current.checkComparatorNum();
+        int reg = parseReg(current.checkLeft());
         Code newInstruction = new Code(Code.Operation.CMP.ordinal(), cmp, reg, data);
         code.add(new Code(Code.Operation.LOD.ordinal(), reg, parseReg(current.checkLeft())));
         code.add(newInstruction);
-
     }
 
     public static void parseMOV(Atom current){ // ~ Brandon
-        int data = parseReg(current.checkRight());
+        int data = parseReg(current.checkLeft());
         int reg = parseReg(current.checkResult());
-        Code newInstruction = new Code(Code.Operation.LOD.ordinal(), reg, data);
+        Code newInstruction = new Code(Code.Operation.STO.ordinal(), reg, data);
         code.add(newInstruction);
     }
 
@@ -154,8 +148,7 @@ public class CodeGen {
             return vars.indexOf(reg);
         } else if (vars.size() != 16){
             vars.add(reg);
-            variable_table.put(reg, programCounter);
-            System.out.println("Adding variable " +reg+ " at location " +programCounter);
+            variable_table.put(reg, programCounter++);
             return vars.indexOf(reg);
         } else {
             // If not, check if there are any available registers
