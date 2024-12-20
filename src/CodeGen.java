@@ -91,7 +91,7 @@ public class CodeGen {
     }
 
     public static void parseSUB(Atom current) { // ~ Steven
-        int data = parseReg(current.checkRight());
+        int data = parseReg(current.checkLeft());
         int reg = parseReg(current.checkResult());
         Code newInstruction = new Code(Code.Operation.SUB.ordinal(), reg, data);
         code.add(newInstruction);
@@ -101,7 +101,7 @@ public class CodeGen {
         int data = parseReg(current.checkRight());
         int reg = parseReg(current.checkResult());
         Code newInstruction = new Code(Code.Operation.MUL.ordinal(), reg, data);
-        code.add(newInstruction);        
+        code.add(newInstruction);
     }
 
     public static void parseDIV(Atom current){ // ~ Tucker
@@ -122,7 +122,8 @@ public class CodeGen {
     }
 
     public static void parseTST(Atom current){
-        int data = parseReg(current.checkRight());
+        Integer labelValue = label_table.get(current.checkDestination());
+        int data = (labelValue != null) ? labelValue : 0; // Destination
         int cmp = current.checkComparatorNum();
         int reg = parseReg(current.checkLeft());
         Code newInstruction = new Code(Code.Operation.CMP.ordinal(), cmp, reg, data);

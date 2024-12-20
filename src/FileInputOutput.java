@@ -47,7 +47,7 @@ public class FileInputOutput {
             }
             fos.write(output.getBytes(StandardCharsets.UTF_8));
             String filePath = fileName + "-output.atoms";
-            System.out.println("\nResults have been written to '" + filePath + "'\nand '" + fileName + "atomOutput.txt'");
+            System.out.println("\nResults have been written to '" + filePath + "'");
             return filePath;
         } catch (IOException e) {
             System.out.println("\nError writing atoms to file: " + e.getMessage());
