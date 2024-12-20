@@ -32,7 +32,7 @@ public class UI {
         
         public String startPrompt()
         {
-            String filePath = "src/HelloWorld.c";
+            String filePath = "HelloWorld.c";
 
             System.out.println("Would you like to execute the frontend?(Y/N)");
             String response = prompt.next().trim().toUpperCase();

@@ -21,8 +21,8 @@ public class FileInputOutput {
         try (FileOutputStream fos = new FileOutputStream(fileName + "-output.atoms")) {
             for (Atom atom : atoms) {
                 output += atom.toString() + "\n";
-                fos.write(output.getBytes(StandardCharsets.UTF_8));
             }
+            fos.write(output.getBytes(StandardCharsets.UTF_8));
             String filePath = fileName + "-output.atoms";
             System.out.println("\nResults have been written to '" + filePath + "\nand " + fileName + "atomOutput.txt");
             return filePath;
@@ -69,18 +69,19 @@ public class FileInputOutput {
         try (FileOutputStream fos = new FileOutputStream(fileName + "-codegen_output.txt")) {
                 fos.write("Loc\tContents\t\tOP\n".getBytes()); // Write header to file
 
-                String output;
+                String output = "";
                 for (Code code : codeList) {
                     if (!code.checkOperation().equals("HLT"))
                     {   output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n";
-                        fos.write(output.getBytes()); //write new output
+                        //fos.write(output.getBytes()); //write new output
                     }
                     else
                     {   output = loc++ + "\t" + code.toString() + "\t\t" + code.checkOperation() + "\n"; // last update before ending loop (HLT)
-                        fos.write(output.getBytes()); //write last output before loop exits
+                        //fos.write(output.getBytes()); //write last output before loop exits
                         break;  // end generation after HLT
                     }
                 }
+                fos.write(output.getBytes());
                 System.out.println("\nLegible results have been written to '" + fileName + "-codegen_output.txt'");
             } catch (IOException e) {
                 System.out.println("Error writing to file: " + e.getMessage());
