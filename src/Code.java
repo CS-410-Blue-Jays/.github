@@ -108,4 +108,7 @@ public class Code {
     public final String addPadding(int num){
         return String.format("%08d", num);
     }
+    public final int checkData() {
+        return (int) (this.code % 100000);
+    }
 }
