@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 class GlobalOptimization {
@@ -11,7 +10,7 @@ class GlobalOptimization {
             {
                 Atom newAtom = optimize(atom);
                 if (newAtom != null){
-                    optimizedAtoms.add(newAtom);
+                    optimizedAtoms.add(newAtom); 
                     System.out.println("Added optimized atom of type " +newAtom.checkOperator());
                 }
 
@@ -88,7 +87,7 @@ class GlobalOptimization {
             System.out.println("Optimization made to " +atom.checkOperator()+ "; Bitwise shift");
 
             int numShifts = logBase2(right);
-            String newLeft = Integer.toString(left << numShifts);
+            String newLeft = Integer.toString(left << numShifts);       //REDUCTION IN STRENGTH '*' to '<<'
             return new Atom(Atom.Operation.MOV, newLeft, atom.checkResult());
            }
 

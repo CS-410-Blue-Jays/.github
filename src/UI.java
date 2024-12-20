@@ -32,7 +32,7 @@ public class UI {
         
         public String startPrompt()
         {
-            String filePath = "src/HelloWorld.c";
+            String filePath = "HelloWorld.c";
 
             System.out.println("Would you like to execute the frontend?(Y/N)");
             String response = prompt.next().trim().toUpperCase();
@@ -49,15 +49,17 @@ public class UI {
             //handle file path
             System.out.println("Would you like to set the default file path to scan and parse for HelloWorld.c?(Y/N)");
             response = prompt.next().trim().toUpperCase();
+    
             if(!response.equals("Y"))
             {
+                prompt.nextLine();
                 //set new file path
                 System.out.println("Enter new filepath for the file you would like to run the frontend applcation on: (example.txt)");
-                response = prompt.nextLine().toLowerCase();
+                response = prompt.nextLine().trim();
                 
                 //validate file path 
                 File file = new File(response);
-
+ 
                 // Check if the file exists
                 if (file.exists()) {
                     // Check if it is a file or a directory
@@ -144,9 +146,6 @@ public class UI {
            atoms = GlobalOptimization.optimizeAtoms(atoms);   
 
            String atom_output_fileName = fio.atomOutput(atoms, filePath);
-
-
-
 
             System.out.println("Frontend done executing");
             return atom_output_fileName;
