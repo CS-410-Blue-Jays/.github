@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 class GlobalOptimization {
@@ -11,7 +10,7 @@ class GlobalOptimization {
             {
                 Atom newAtom = optimize(atom);
                 if (newAtom != null){
-                    optimizedAtoms.add(newAtom);
+                    optimizedAtoms.add(newAtom); 
                     System.out.println("Added optimized atom of type " +newAtom.checkOperator());
                 }
 

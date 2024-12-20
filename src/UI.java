@@ -49,15 +49,17 @@ public class UI {
             //handle file path
             System.out.println("Would you like to set the default file path to scan and parse for HelloWorld.c?(Y/N)");
             response = prompt.next().trim().toUpperCase();
+    
             if(!response.equals("Y"))
             {
+                prompt.nextLine();
                 //set new file path
                 System.out.println("Enter new filepath for the file you would like to run the frontend applcation on: (example.txt)");
-                response = prompt.nextLine().toLowerCase();
+                response = prompt.nextLine().trim();
                 
                 //validate file path 
                 File file = new File(response);
-
+ 
                 // Check if the file exists
                 if (file.exists()) {
                     // Check if it is a file or a directory
