@@ -159,8 +159,8 @@ public class UI {
         System.out.println("Would you like to enable Local Optimization? (Y/N)");
         String response = prompt.next().trim().toUpperCase();
         if(response.equals("Y")){
-            code = LocalOptimization.optimizeCode(code);
             System.out.println("Performing Local Optimization");
+            code = LocalOptimization.optimizeCode(code);
         }
 
         fio.codeGenTxtOutput(fileName + "-output.txt", code);	//codeGen output to .txt

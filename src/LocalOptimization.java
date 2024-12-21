@@ -20,7 +20,6 @@ public class LocalOptimization {
           optimizedCode.add(newCode);
         }
       }
-
           return optimizedCode;
     }
     
