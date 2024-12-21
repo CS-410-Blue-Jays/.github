@@ -42,8 +42,8 @@ public class LocalOptimization {
       int data = code.checkData(); //this is suppos to extract data value
 
       int reg = code.checkReg();
-      System.out.println("operator: " + operator);
-      System.out.println("DATA: " + data);
+      // System.out.println("operator: " + operator);
+      // System.out.println("DATA: " + data);
       // switch statement for different operations
       switch(operator){
         case "MUL":
@@ -52,20 +52,20 @@ public class LocalOptimization {
           }
           break;
         case "ADD":
-          System.out.println("IN \"ADD\", Data = " + data);
+          // System.out.println("IN \"ADD\", Data = " + data);
           if(data == 0){ // Ex: x + 0 = x
             return null;
           }
           break;
         case "SUB":
           if(data == 0){ // Ex: x - 0 = x
-            System.out.println(" HIT sub");
+            // System.out.println(" HIT sub");
             return null;
           }
           break;
         case "DIV":
           if(data == 1){ // Ex x / 1 = x
-            System.out.println("HIT div");
+            // System.out.println("HIT div");
             return null;
           }
           break;
